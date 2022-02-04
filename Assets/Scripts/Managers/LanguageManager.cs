@@ -15,9 +15,6 @@ public class LanguageManager : MonoBehaviour
 
         // 这里lang从SettingVarManager读取，后补
         lang = "";
-        Debug.Log(GetText("a"));
-        Debug.Log(pack["a"]["CHT"]);
-
     }
 
     public void SetLanguage(string _lang)
