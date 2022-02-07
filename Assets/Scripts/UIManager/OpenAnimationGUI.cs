@@ -31,7 +31,7 @@ public class OpenAnimationGUI : MonoBehaviour
     /// </summary>
     public void OnEnter()
     {
-
+        
     }
 
     /// <summary>

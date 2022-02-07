@@ -8,8 +8,14 @@ public class LanguageManager : MonoBehaviour
     private Dictionary<string, Hashtable> pack;
     private string lang;
     private List<Hashtable> p1;
+    private static LanguageManager instance;
+    public static LanguageManager GetInstance
+    {
+        get { return instance; }
+    }
     private void Awake()
     {
+        instance = this;
         defaultLang = "CHS";
         pack = ExcelManager.GetExcel("LanguagePack");
 
