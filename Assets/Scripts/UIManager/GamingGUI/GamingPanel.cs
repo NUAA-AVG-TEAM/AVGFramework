@@ -349,11 +349,11 @@ public class GamingPanel : MonoBehaviour
                 break;
 
             case "PVD":
-                VideoManager.GetInstance.PlayVideo(_params["ID"].ToString());
+                //////VideoManager.GetInstance.PlayVideo(_params["ID"].ToString());
                 break;
 
             case "SVD":
-                VideoManager.GetInstance.StopVideo(_params["ID"].ToString());
+                //////VideoManager.GetInstance.StopVideo(_params["ID"].ToString());
                 break;
 
 
