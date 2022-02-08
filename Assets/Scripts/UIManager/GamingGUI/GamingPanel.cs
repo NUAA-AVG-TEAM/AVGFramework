@@ -39,6 +39,8 @@ public class GamingPanel : MonoBehaviour
 
     private int sceneIndex;   //当前场景名称的索引
     private int groupIndex;   //当前指令对话所在组的位置
+
+    private bool isGaming;
     public static GamingPanel GetInstance
     {
         get { return instance; }
@@ -48,7 +50,18 @@ public class GamingPanel : MonoBehaviour
     {
         sceneIndex = _sceneIndex;
         nowIndex = _sceneIndex;
+        groupIndex = 0;
         UIManager.GetInstance.GetSMachine.ChangeState("GamingGUI");
+    }
+
+    public void KeyboardBind()
+    {
+        // 绑定所有按键事件
+    }
+    
+    public void KeyboardUnBind()
+    {
+        // 解绑所有按键事件
     }
     
 
@@ -65,7 +78,7 @@ public class GamingPanel : MonoBehaviour
             // 去saveloadGUI
             StateMachine sMachine = UIManager.GetInstance.GetSMachine;
             sMachine.ChangeState("SaveLoadGUI");
-            SaveLoadGUI.GetInstance.GetSMachine.ChangeState("SavePanel");
+            ////// SaveLoadGUI.GetInstance.GetSMachine.ChangeState("SavePanel");
 
         });
 
@@ -74,12 +87,12 @@ public class GamingPanel : MonoBehaviour
             // 去saveloadGUI
             StateMachine sMachine = UIManager.GetInstance.GetSMachine;
             sMachine.ChangeState("SaveLoadGUI");
-            SaveLoadGUI.GetInstance.GetSMachine.ChangeState("LoadPanel");
+            ////// SaveLoadGUI.GetInstance.GetSMachine.ChangeState("LoadPanel");
         });
 
         qSaveBtn.onClick.AddListener(delegate
         {
-            SaveLoadGUI.GetInstance.ChangeQSaveData(GetGameMessage());
+            ////// SaveLoadGUI.GetInstance.ChangeQSaveData(GetGameMessage());
         });
 
         qLoadBtn.onClick.AddListener(delegate
@@ -87,7 +100,7 @@ public class GamingPanel : MonoBehaviour
             // 去saveloadGUI
             StateMachine sMachine = UIManager.GetInstance.GetSMachine;
             sMachine.ChangeState("SaveLoadGUI");
-            SaveLoadGUI.GetInstance.GetSMachine.ChangeState("QLoadPanel");
+            ////// SaveLoadGUI.GetInstance.GetSMachine.ChangeState("QLoadPanel");
         });
 
         // 往前找
@@ -95,14 +108,15 @@ public class GamingPanel : MonoBehaviour
         {
             // 后补UI逻辑
             int groupnum = 0;
-            for(int i = nowIndex;i > 3;i--)
+            int i = nowIndex;
+            while (i > 3)
             {
-                if(instrPack[i]["type"].ToString().ToUpper() == "GST")
+                if (instrPack[i]["type"].ToString().ToUpper() == "GST")
                 {
                     groupnum++;
                 }
                 // 场景开始，且不是第一句话
-                else if(instrPack[i]["type"].ToString().ToUpper() == "SST")
+                else if (instrPack[i]["type"].ToString().ToUpper() == "SST")
                 {
                     if (groupnum > 1)
                     {
@@ -111,16 +125,21 @@ public class GamingPanel : MonoBehaviour
                     }
                 }
                 // 场景结束，直接跳到该场景开始的位置
-                else if(instrPack[i]["type"].ToString().ToUpper() == "SED")
+                // groupIndex找的是场景开始的
+                else if (instrPack[i]["type"].ToString().ToUpper() == "SED")
                 {
                     // 在这里找一下Index即可~
                     JumpScene((int)instrPack[i]["groupIndex"]);
                     break;
                 }
                 // 章节开始，不能跳
-                else if(instrPack[i]["type"].ToString().ToUpper()== "CST")
+                else if (instrPack[i]["type"].ToString().ToUpper() == "CST")
                 {
                     break;
+                }
+                else
+                {
+                    i = (instrPack[i]["groupIndex"] == null) ? (i - 1) : (int)instrPack[i]["groupIndex"];
                 }
             }
         });
@@ -148,7 +167,7 @@ public class GamingPanel : MonoBehaviour
             // 不用状态机来管理
             // 直接打开，并解绑事件
 
-            LogPanel.GetInstance.gameObject.SetActive(true);
+            LogPanel.GetInstance.OnEnter();
             //解绑键盘事件，后补
         });
 
@@ -175,6 +194,7 @@ public class GamingPanel : MonoBehaviour
     private void Awake()
     {
         instance = this;
+        isGaming = false;
     }
 
     public GameObject GetUIInstance()
@@ -190,7 +210,7 @@ public class GamingPanel : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        //绑定键盘事件
     }
 
     /// <summary>
@@ -201,7 +221,7 @@ public class GamingPanel : MonoBehaviour
         instance.gameObject.SetActive(true);
         StartCoroutine("GameStart");
         // 提前记录一下设置里有关游戏进行的所有变量~,后补
-
+        isGaming = true;
 
         // 
 
@@ -212,9 +232,11 @@ public class GamingPanel : MonoBehaviour
     /// </summary>
     public void OnLeave()
     {
+        isGaming = false;
         instance.gameObject.SetActive(false);
         btn.onClick.RemoveAllListeners();
         StopCoroutine("GameStart");
+        
     }
 
     public void SetInstructionIndex(int _index)
@@ -229,6 +251,11 @@ public class GamingPanel : MonoBehaviour
 
     // 返回当前组的索引
     public int GetInstructionIndex()
+    {
+        return nowIndex;
+    }
+
+    public int GetGroupIndex()
     {
         return groupIndex;
     }
@@ -280,11 +307,12 @@ public class GamingPanel : MonoBehaviour
         /// CGSP: Change Sprite'
         /// GST: Group Start
         /// SST: Scene Start
+        /// 记得加个鼠标点击缓冲事件，这个比较有必要还
         /// </summary>
         switch (type)
         {
             case "PTX":
-                DialogManager.GetInstance.PlayText(LanguageManager.GetInstance.GetText(_params["ID"].ToString(), isAuto ? autoSpeed : textSpeed));
+                ////// DialogManager.GetInstance.PlayText(LanguageManager.GetInstance.GetText(_params["ID"].ToString(), isAuto ? autoSpeed : textSpeed));
                 break;
 
             case "PSE":
@@ -334,27 +362,27 @@ public class GamingPanel : MonoBehaviour
             case "CSP":
                 ht = JsonMapper.ToObject<Hashtable>(_params["params"].ToString());
                 // 先这么写着，之后再沟通
-                SpriteManager.GetInstance.CreateSprite(_params["ID"], ht["name"].ToString(), ht, isSkip);
+                ////// SpriteManager.GetInstance.CreateSprite(_params["ID"], ht["name"].ToString(), ht, isSkip);
                 break;
 
             case "DSP":
                 ht = JsonMapper.ToObject<Hashtable>(_params["params"].ToString());
                 // 先这么写着，之后再沟通
-                SpriteManager.GetInstance.DeleteSprite(_params["ID"], isSkip);
+                ////// SpriteManager.GetInstance.DeleteSprite(_params["ID"], isSkip);
                 break;
 
             case "MSP":
                 ht = JsonMapper.ToObject<Hashtable>(_params["params"].ToString());
                 // 先这么写着，之后再沟通
                 vt = JsonMapper.ToObject<List<string>>(_params["ID"].ToString());
-                SpriteManager.GetInstance.MoveSprite(vt, ht["name"].ToString(), ht, isSkip);
+                ////// SpriteManager.GetInstance.MoveSprite(vt, ht["name"].ToString(), ht, isSkip);
                 break;
 
             case "CGSP":
                 ht = JsonMapper.ToObject<Hashtable>(_params["params"].ToString());
                 // 先这么写着，之后再沟通
                 vt = JsonMapper.ToObject<List<string>>(_params["ID"].ToString());
-                SpriteManager.GetInstance.ChangeSprite(vt, ht["name"].ToString(), ht, ht["dout"], isSkip);
+                ////// SpriteManager.GetInstance.ChangeSprite(vt, ht["name"].ToString(), ht, ht["dout"], isSkip);
                 break;
 
             case "GST":
@@ -400,8 +428,13 @@ public class GamingPanel : MonoBehaviour
     IEnumerator GameStart()
     {
         // 需保证在执行协程之前，这些变量均初始化好，后补健壮处理
-        
-        groupIndex = nowIndex;
+        // 假如是存档 / 继续游戏/ 开始游戏进来的，需要重置，重置前默认把groupIndex重置成0即可
+        // 否则目前的状态可以利用，groupindex不用重置
+        if (groupIndex == 0)
+        {
+            groupIndex = nowIndex;
+        }
+  
 
         int nextIndex = nowIndex + 1;
         
@@ -516,4 +549,7 @@ public class GamingPanel : MonoBehaviour
         }
         btn.onClick.RemoveListener(ButtonClick);
     }
+
+
+
 }
