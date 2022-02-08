@@ -22,8 +22,9 @@ public class DialogManager : MonoBehaviour
     {
         IfPrinting = false;
         IfComplete = false;
-        text = gp.LogPanel.Text;
+        //text = gp.LogPanel.Text;
         instance = this;
+        speed = 0;
         timer = 0;
     }
     private void Update() 
@@ -34,9 +35,9 @@ public class DialogManager : MonoBehaviour
             {
                 int TempTime;
                 TempTime = (int)(speed*timer); 
-                if(TempTime <= TextContent.Length())
+                if(TempTime <= TextContent.Length)
                 {
-                    text.Text = TextContent.Substring(0,TempTime);
+                    text.text = TextContent.Substring(0,TempTime);
                     timer += Time.deltaTime; 
                 }
                 else
@@ -47,21 +48,23 @@ public class DialogManager : MonoBehaviour
         }
         else
         {
-            text.Text = TextContent;
+            text.text = TextContent;
             EndPlay();
         }  
     }
     private void EndPlay()
     {
         TextContent = "";
+        speed = 0;
         IfComplete = false;
         IfPrinting = false;
         timer = 0;
     }
-    private void PlayText(string _text)
+    public void PlayText(string _text,float gaptime)
     {
-        text.Text = "";//清空text
+        text.text = "";//清空text
         TextContent = _text;
+        speed = gaptime;
         IfPrinting = true;
     }
     //需要加一个对按钮的管理事件
