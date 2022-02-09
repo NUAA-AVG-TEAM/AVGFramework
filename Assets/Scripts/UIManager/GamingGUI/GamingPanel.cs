@@ -223,7 +223,6 @@ public class GamingPanel : MonoBehaviour
         // 提前记录一下设置里有关游戏进行的所有变量~,后补
         isGaming = true;
 
-        // 
 
     }
 
@@ -307,6 +306,10 @@ public class GamingPanel : MonoBehaviour
         /// CGSP: Change Sprite'
         /// GST: Group Start
         /// SST: Scene Start
+        /// SED: Scene End
+        /// CST: Chapter Start
+        /// CED: Chapter End
+        /// CHO: Choice Normal
         /// 记得加个鼠标点击缓冲事件，这个比较有必要还
         /// </summary>
         switch (type)
@@ -392,6 +395,14 @@ public class GamingPanel : MonoBehaviour
             case "SST":
                 sceneIndex = nowIndex;
                 break;
+
+            case "CHN":
+                //普通Choice，直接修改下一个即可,这里阻塞线程，本质上是进入另一个协程
+                return 1000001;                
+
+            case "CED":
+                return -1;
+            
         }
 
         return 0;
@@ -427,6 +438,7 @@ public class GamingPanel : MonoBehaviour
 
     IEnumerator GameStart()
     {
+        
         // 需保证在执行协程之前，这些变量均初始化好，后补健壮处理
         // 假如是存档 / 继续游戏/ 开始游戏进来的，需要重置，重置前默认把groupIndex重置成0即可
         // 否则目前的状态可以利用，groupindex不用重置
@@ -472,7 +484,12 @@ public class GamingPanel : MonoBehaviour
             nextIndex = (int)nowInstr["nextIndex"];
             LockButton();
             int msg = Execute(nowInstr, isSkip);
-
+            if(msg == 1000001)
+            {
+                ChoicePanel.GetInstance.ResetIndex();
+                yield return ChoicePanel.GetInstance.GetIndex() > 0;
+                msg = ChoicePanel.GetInstance.GetIndex();
+            }
             // 留个坑，记得把面板打开
             if(!textBg.activeSelf)
             {
@@ -515,9 +532,13 @@ public class GamingPanel : MonoBehaviour
             nowIndex = nextIndex;
 
             // msg != 0说明是选择分支，msg即为下一条指令的地址
-            if(msg != 0)
+            if(msg > 0)
             {
                 nowIndex = msg;
+            }
+            else if(msg < 0)
+            {
+                break;
             }
             yield return 1;
         }
