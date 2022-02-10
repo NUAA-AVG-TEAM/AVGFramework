@@ -17,7 +17,7 @@ public class UIManager : MonoBehaviour
     private void Awake()
     {
         instance = this;
-
+        
         // 添加状态
         sMachine.AddState("OpenAnimationGUI", OpenAnimationGUI.GetInstance.OnEnter, OpenAnimationGUI.GetInstance.OnLeave);
         sMachine.AddState("MainGUI", MainGUI.GetInstance.OnEnter, OpenAnimationGUI.GetInstance.OnLeave);
