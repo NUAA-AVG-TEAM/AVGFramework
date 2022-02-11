@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using LitJson;
+using DG.Tweening;
 public class GamingPanel : MonoBehaviour
 {
     private static GamingPanel instance;
@@ -31,7 +32,18 @@ public class GamingPanel : MonoBehaviour
     public Button settingBtn;
     public Button hideBtn;
     private bool _isClick;
-    private bool isSkip = false; //是否处在跳过模式
+    private bool isSkip = false;  //是否处在跳过模式
+    private bool IsSkip
+    {
+        set
+        {
+            isSkip = value;
+            //补改贴图逻辑
+        }
+
+    }
+
+
     private bool isAuto = false; //是否处在自动模式
     private bool isHide = false; //是否处在隐藏模式
     private GameObject textBg;
@@ -41,6 +53,9 @@ public class GamingPanel : MonoBehaviour
     private int groupIndex;   //当前指令对话所在组的位置
 
     private bool isGaming;
+
+    public Image bg;    // 背景图片
+    public Image imgMask;  //生成的纯黑图片
     public static GamingPanel GetInstance
     {
         get { return instance; }
@@ -54,14 +69,50 @@ public class GamingPanel : MonoBehaviour
         UIManager.GetInstance.GetSMachine.ChangeState("GamingGUI");
     }
 
+
+    /// <summary>
+    /// 凡是涉及到改isSkip的，都要改相应UI，现在没写逻辑，后补
+    /// </summary>
     public void KeyboardBind()
     {
         // 绑定所有按键事件
+
+        // 按空格
+        void JumpSingle()
+        {
+            btn.onClick.Invoke();
+        }
+        KeyboardManager.GetInstance.Connect(0, KeyCode.Return, "jumpsingle", JumpSingle);
+
+        void Jump()
+        {
+            IsSkip = true;
+        }
+        KeyboardManager.GetInstance.Connect(1, KeyCode.LeftControl, "jump", Jump);
+
+        void CancelJump()
+        {
+            isSkip = false;
+
+        }
+        KeyboardManager.GetInstance.Connect(2, KeyCode.LeftControl, "canceljump", CancelJump);
+
+        void Log()
+        {
+            logBtn.onClick.Invoke();
+        }
+        KeyboardManager.GetInstance.Connect(2, KeyCode.UpArrow, "log", Log);
     }
     
     public void KeyboardUnBind()
     {
         // 解绑所有按键事件
+        KeyboardManager.GetInstance.DisConnect(0, KeyCode.Return, "jumpsingle");
+        KeyboardManager.GetInstance.DisConnect(1, KeyCode.LeftControl, "jump");
+        KeyboardManager.GetInstance.DisConnect(2, KeyCode.LeftControl, "canceljump");
+        KeyboardManager.GetInstance.DisConnect(2, KeyCode.UpArrow, "log");
+
+
     }
     
 
@@ -218,7 +269,10 @@ public class GamingPanel : MonoBehaviour
     /// </summary>
     public void OnEnter()
     {
+        // 图片透明度设置成0
+        bg.color = new Color(bg.color.r, bg.color.b, bg.color.a, 0);
         instance.gameObject.SetActive(true);
+        bg.DOFade(1, 0.5f);
         StartCoroutine("GameStart");
         // 提前记录一下设置里有关游戏进行的所有变量~,后补
         isGaming = true;
@@ -232,10 +286,21 @@ public class GamingPanel : MonoBehaviour
     public void OnLeave()
     {
         isGaming = false;
-        instance.gameObject.SetActive(false);
         btn.onClick.RemoveAllListeners();
         StopCoroutine("GameStart");
+
+        bg.color = new Color(bg.color.r, bg.color.g, bg.color.b, 0);
+        // 目前图片的透明度变成0
+        //不阻塞线程，两个显示同时触发即可~
+        bg.DOFade(0, 0.5f).OnComplete(() => {
+            gameObject.SetActive(false);
+            bg.color = new Color(bg.color.r, bg.color.g, bg.color.b, 1);
+        });
         
+
+        
+        
+
     }
 
     public void SetInstructionIndex(int _index)
@@ -282,6 +347,8 @@ public class GamingPanel : MonoBehaviour
     /// <param name="_params"></param>
     /// <param name="_isSkip"></param>
     /// <returns></returns>
+    /// 
+
     private int Execute(Hashtable _params, bool _isSkip)
     {
         
@@ -487,6 +554,7 @@ public class GamingPanel : MonoBehaviour
             if(msg == 1000001)
             {
                 ChoicePanel.GetInstance.ResetIndex();
+                ChoicePanel.GetInstance.ChoiceNormal(nowInstr["params"].ToString());
                 yield return ChoicePanel.GetInstance.GetIndex() > 0;
                 msg = ChoicePanel.GetInstance.GetIndex();
             }
