@@ -28,11 +28,12 @@ public class VideoManager : MonoBehaviour
         //videoPlayer.canSetTime = true;
     }
 
-    public void PlayVideo(string _name,UnityEngine.Video.VideoPlayer vp)
+    public IEnumerator PlayVideo(string _name,UnityEngine.Video.VideoPlayer vp)
     {
         vp.url = _name;
         vp.Prepare();
         Debug.Log("Video Prepared and Play");
+        
         vp.Play();
     }
 
