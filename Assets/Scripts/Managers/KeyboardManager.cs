@@ -12,12 +12,20 @@ public class KeyboardManager : MonoBehaviour
     // mode 0: 按下 1:长按 2: 抬起
     // 考虑到unity是伪多线程，应该不会对效率产生影响~
     //private Dictionary<KeyCode, Dictionary<string, System.Action>> dict;
-    public List<Dictionary<KeyCode, Dictionary<string, System.Action>>> list;
+    private List<Dictionary<KeyCode, Dictionary<string, System.Action>>> list;
+
+    private static KeyboardManager instance;
+    public static KeyboardManager GetInstance
+    {
+        get { return instance; }
+    }
+
     private int maxMode;
     // Start is called before the first frame update
     private void Awake()
     {
         // 初始化
+        instance = this;
         maxMode = 3;
         list = new List<Dictionary<KeyCode, Dictionary<string, System.Action>>>();
         for (int i = 0; i < maxMode; i++)

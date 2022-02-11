@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
+using DG.Tweening;
 public class LogPanel : MonoBehaviour
 {
     private static LogPanel instance;
@@ -21,6 +21,11 @@ public class LogPanel : MonoBehaviour
     public Button logBackBtn;   //log上的返回
     public Button sceneBackBtn; //scene上的返回
 
+    public Image bgText;    //bgText;
+    public Image bg;    //图片的背景，现在先空下
+    public Image btnsPanel;    //按钮面板 不用panel，获取不到太蛋疼了
+
+    private float fadeTime = 0.5f;
     int pageNum;        // 屏幕渲染选项数量
 
 
@@ -143,8 +148,17 @@ public class LogPanel : MonoBehaviour
         //先渲染画面
 
         RenderPanel();
+
+
+        //首先将自己的透明度调成0
+        bg.color = new Color(bg.color.r, bg.color.g, bg.color.b, bg.color.a);
+        btnsPanel.color = new Color(btnsPanel.color.r, btnsPanel.color.g, btnsPanel.color.b, btnsPanel.color.a);
         instance.gameObject.SetActive(true);
         logPnl.SetActive(true);
+        //将背景版透明度调成0,自己透明度调成1
+        bgText.DOFade(0, fadeTime);
+        btnsPanel.DOFade(0, fadeTime);
+        bg.DOFade(1, fadeTime);        
     }
 
     public void ButtonBind()
@@ -182,8 +196,22 @@ public class LogPanel : MonoBehaviour
     /// </summary>
     public void OnLeave()
     {
-        scenePnl.SetActive(false);
-        logPnl.SetActive(false);
+
+
+
+        //将背景版透明度调成0,自己透明度调成1
+        // 记得加一个canvas group~
+        bgText.DOFade(1, fadeTime);
+        btnsPanel.DOFade(1, fadeTime);
+        bg.DOFade(0, fadeTime).OnComplete(()=> {
+            scenePnl.SetActive(false);
+            logPnl.SetActive(false);
+            //把组件下的所有东西去掉，
+            FunctionUtil.GetInstance.RemoveChildren(logSv.transform);
+        });
+
+        
+        
         // 绑定事件
         GamingPanel.GetInstance.KeyboardBind();
         
