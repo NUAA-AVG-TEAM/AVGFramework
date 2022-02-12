@@ -18,7 +18,11 @@ public class UIManager : MonoBehaviour
     {
         instance = this;
 
+        sMachine = new StateMachine("UIManager");
+        Debug.Log(sMachine);
+
         // 添加状态
+        Debug.Log(OpenAnimationGUI.GetInstance);
         sMachine.AddState("OpenAnimationGUI", OpenAnimationGUI.GetInstance.OnEnter, OpenAnimationGUI.GetInstance.OnLeave);
         sMachine.AddState("MainGUI", MainGUI.GetInstance.OnEnter, OpenAnimationGUI.GetInstance.OnLeave);
         sMachine.AddState("SaveLoadGUI", SaveLoadGUI.GetInstance.OnEnter, OpenAnimationGUI.GetInstance.OnLeave);
@@ -28,10 +32,7 @@ public class UIManager : MonoBehaviour
         
         // 设置默认状态
         // 注意要先添加状态再设置默认状态~
-        sMachine.SetDefaultState("OpenAnimationGUI");
-        
-
-        
+        sMachine.SetDefaultState("OpenAnimationGUI");        
     }
     
     public StateMachine GetSMachine
