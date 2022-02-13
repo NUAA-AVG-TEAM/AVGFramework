@@ -21,10 +21,13 @@ public class LogPanel : MonoBehaviour
     public Button logBackBtn;   //log上的返回
     public Button sceneBackBtn; //scene上的返回
 
+    public Image Bg;
     public Image bgText;    //bgText;
     public Image bg;    //图片的背景，现在先空下
     public Image btnsPanel;    //按钮面板 不用panel，获取不到太蛋疼了
 
+    public Scrollbar barLog;    //滚动条
+    public Scrollbar barScene;
     private float fadeTime = 0.5f;
     int pageNum;        // 屏幕渲染选项数量
 
@@ -141,15 +144,19 @@ public class LogPanel : MonoBehaviour
 
     }
 
-    public void OnEnter()
+    public IEnumerator OnEnter()
     {
         //解绑事件
         GamingPanel.GetInstance.KeyboardUnBind();
         //先渲染画面
 
         RenderPanel();
+        //将滚动条调到最下方~
+        barLog.value = 0;
+        barScene.value = 0;
 
-
+        //等一帧才会刷新~
+        yield return new WaitForEndOfFrame();
         //首先将自己的透明度调成0
         bg.color = new Color(bg.color.r, bg.color.g, bg.color.b, bg.color.a);
         btnsPanel.color = new Color(btnsPanel.color.r, btnsPanel.color.g, btnsPanel.color.b, btnsPanel.color.a);
@@ -158,7 +165,8 @@ public class LogPanel : MonoBehaviour
         //将背景版透明度调成0,自己透明度调成1
         bgText.DOFade(0, fadeTime);
         btnsPanel.DOFade(0, fadeTime);
-        bg.DOFade(1, fadeTime);        
+        bg.DOFade(1, fadeTime);
+        yield break;
     }
 
     public void ButtonBind()
@@ -207,7 +215,7 @@ public class LogPanel : MonoBehaviour
             scenePnl.SetActive(false);
             logPnl.SetActive(false);
             //把组件下的所有东西去掉，
-            FunctionUtil.GetInstance.RemoveChildren(logSv.transform);
+            FunctionUtil.RemoveChildren(logSv.transform);
         });
 
         
