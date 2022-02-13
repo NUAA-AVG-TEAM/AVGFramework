@@ -1,12 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 public class VideoManager : MonoBehaviour
 {
     private static VideoManager instance;
-    // 将一个 VideoPlayer 附加到主摄像机。
-    
 
     public static VideoManager GetInstance
     {
@@ -19,7 +16,8 @@ public class VideoManager : MonoBehaviour
     }
     // Start is called before the first frame update
     void Start()
-    {   GameObject camera = GameObject.Find("Main Camera");
+    {   
+        GameObject camera = GameObject.Find("Main Camera");
         var videoPlayer = camera.AddComponent<UnityEngine.Video.VideoPlayer>();
         videoPlayer.playOnAwake = false;
         videoPlayer.renderMode = UnityEngine.Video.VideoRenderMode.CameraNearPlane;
@@ -28,12 +26,11 @@ public class VideoManager : MonoBehaviour
         //videoPlayer.canSetTime = true;
     }
 
-    public IEnumerator PlayVideo(string _name,UnityEngine.Video.VideoPlayer vp)
+    public void PlayVideo(string _name,UnityEngine.Video.VideoPlayer vp)
     {
         vp.url = _name;
         vp.Prepare();
         Debug.Log("Video Prepared and Play");
-        
         vp.Play();
     }
 
@@ -45,6 +42,7 @@ public class VideoManager : MonoBehaviour
     public void DeleteVideo(UnityEngine.Video.VideoPlayer vp)
     {
         vp.url = "";
+        //待测试+功能
     }
 
     public void EndVideo(string _name,UnityEngine.Video.VideoPlayer vp)
