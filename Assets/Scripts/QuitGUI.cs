@@ -5,8 +5,8 @@ using UnityEngine;
 public class QuitGUI : MonoBehaviour
 {
     private static QuitGUI instance;
-    
 
+    float a = 2.0f;
     public static QuitGUI GetInstance
     {
         get { return instance; }

@@ -12,8 +12,8 @@ public class GamingPanel : MonoBehaviour
     private bool isChangeTxtColor;   //是否改变已读文字颜色
     private bool isStopCV;  //点击鼠标时CV是否停止
     private bool isCancelAuto;  //点击鼠标时是否停止自动状态
-    private double textSpeed; //文字显示速度
-    private double autoSpeed;   //auto文字播放速度
+    private float textSpeed; //文字显示速度
+    private float autoSpeed;   //auto文字播放速度
     private bool isFinishCV;    //是否等待CV播放完成了之后再进行下一幕
     private string lang;    //当前的语言
     List<Hashtable> instrPack;  //指令配表
@@ -33,6 +33,7 @@ public class GamingPanel : MonoBehaviour
     public Button hideBtn;
     private bool _isClick;
     private bool isSkip = false;  //是否处在跳过模式
+    private int msg = 0;
     private bool IsSkip
     {
         set
@@ -186,7 +187,9 @@ public class GamingPanel : MonoBehaviour
                 // 章节开始，不能跳
                 else if (instrPack[i]["type"].ToString().ToUpper() == "CST")
                 {
+                    Debug.Log("这是最开始的场景，不能往前跳哦~");
                     break;
+
                 }
                 else
                 {
@@ -205,9 +208,10 @@ public class GamingPanel : MonoBehaviour
                     JumpScene(i);
                     break;
                 }
-                // 章节开始，不能跳
+                // 章节结束，不能跳
                 else if (instrPack[i]["type"].ToString().ToUpper() == "CED")
                 {
+                    Debug.Log("这是最后一个场景，无法跳转！");
                     break;
                 }
             }
@@ -218,7 +222,7 @@ public class GamingPanel : MonoBehaviour
             // 不用状态机来管理
             // 直接打开，并解绑事件
 
-            LogPanel.GetInstance.OnEnter();
+            StartCoroutine(LogPanel.GetInstance.OnEnter());
             //解绑键盘事件，后补
         });
 
@@ -240,6 +244,20 @@ public class GamingPanel : MonoBehaviour
             // 后补按钮SetActiveFalse
 
         });
+
+        //按钮悬浮事件，后补
+        UIEventListener autoListener = autoBtn.gameObject.AddComponent<UIEventListener>();
+        
+        autoListener.OnMouseEnter += delegate (GameObject _object)
+        {
+
+        };
+        autoListener.OnMouseExit += delegate (GameObject _object)
+        {
+
+        };
+
+        
 
     }
     private void Awake()
@@ -306,6 +324,7 @@ public class GamingPanel : MonoBehaviour
     public void SetInstructionIndex(int _index)
     {
         nowIndex = _index;
+        
     }
 
     public void SetSceneIndex(int _sceneIndex)
@@ -313,12 +332,13 @@ public class GamingPanel : MonoBehaviour
         sceneIndex = _sceneIndex;
     }
 
-    // 返回当前组的索引
+    
     public int GetInstructionIndex()
     {
         return nowIndex;
     }
 
+    // 返回当前组的索引
     public int GetGroupIndex()
     {
         return groupIndex;
@@ -328,7 +348,7 @@ public class GamingPanel : MonoBehaviour
     {
         SaveData data = new SaveData();
         data.index = groupIndex;
-        for(int i = data.index;i < 0x3f3f3f3f ; i++)
+        for(int i = nowIndex;i < 0x3f3f3f3f ; i++)
         {
             if(instrPack[i]["type"].ToString().ToUpper() == "CBG")
             {
@@ -348,8 +368,8 @@ public class GamingPanel : MonoBehaviour
     /// <param name="_isSkip"></param>
     /// <returns></returns>
     /// 
-
-    private int Execute(Hashtable _params, bool _isSkip)
+    
+    private IEnumerator Execute(Hashtable _params, bool _isSkip)
     {
         
         string type = _params["type"].ToString().ToUpper();
@@ -382,7 +402,7 @@ public class GamingPanel : MonoBehaviour
         switch (type)
         {
             case "PTX":
-                ////// DialogManager.GetInstance.PlayText(LanguageManager.GetInstance.GetText(_params["ID"].ToString(), isAuto ? autoSpeed : textSpeed));
+                yield return DialogManager.GetInstance.PlayText(LanguageManager.GetInstance.GetText(_params["ID"].ToString()), isAuto ? autoSpeed : textSpeed);
                 break;
 
             case "PSE":
@@ -465,14 +485,18 @@ public class GamingPanel : MonoBehaviour
 
             case "CHN":
                 //普通Choice，直接修改下一个即可,这里阻塞线程，本质上是进入另一个协程
-                return 1000001;                
+                ChoicePanel.GetInstance.ResetIndex();
+                ChoicePanel.GetInstance.ChoiceNormal(_params["params"].ToString());
+                yield return ChoicePanel.GetInstance.GetIndex() > 0;
+                msg = ChoicePanel.GetInstance.GetIndex();
+                break;
 
             case "CED":
-                return -1;
+                yield break;
             
         }
 
-        return 0;
+        yield break ;
         
     }
 
@@ -537,12 +561,34 @@ public class GamingPanel : MonoBehaviour
 
         void LockButton()
         {
+            autoBtn.interactable = false;
+            saveBtn.interactable = false;
+            qSaveBtn.interactable = false;
+            loadBtn.interactable = false;
+            qLoadBtn.interactable = false;
+            lastSceneBtn.interactable = false;
+            nextSceneBtn.interactable = false;
+            skipBtn.interactable = false;
+            logBtn.interactable = false;
+            settingBtn.interactable = false;
+            hideBtn.interactable = false;
             
+                
         }
 
         void UnLockButton()
         {
-
+            autoBtn.interactable = true;
+            saveBtn.interactable = true;
+            qSaveBtn.interactable = true;
+            loadBtn.interactable = true;
+            qLoadBtn.interactable = true;
+            lastSceneBtn.interactable = true;
+            nextSceneBtn.interactable = true;
+            skipBtn.interactable = true;
+            logBtn.interactable = true;
+            settingBtn.interactable = true;
+            hideBtn.interactable = true;
         }
         btn.onClick.AddListener(StopSkip);
         while (nowIndex != 0)
@@ -550,7 +596,8 @@ public class GamingPanel : MonoBehaviour
             Hashtable nowInstr = instrPack[nowIndex];
             nextIndex = (int)nowInstr["nextIndex"];
             LockButton();
-            int msg = Execute(nowInstr, isSkip);
+            yield return Execute(nowInstr, isSkip);
+            /*
             if(msg == 1000001)
             {
                 ChoicePanel.GetInstance.ResetIndex();
@@ -558,6 +605,7 @@ public class GamingPanel : MonoBehaviour
                 yield return ChoicePanel.GetInstance.GetIndex() > 0;
                 msg = ChoicePanel.GetInstance.GetIndex();
             }
+            */
             // 留个坑，记得把面板打开
             if(!textBg.activeSelf)
             {
@@ -609,10 +657,7 @@ public class GamingPanel : MonoBehaviour
                 break;
             }
             yield return 1;
-        }
-
-
-        
+        }        
     }
 
     IEnumerator Wait(int _times)

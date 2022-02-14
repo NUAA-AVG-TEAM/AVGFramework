@@ -75,6 +75,41 @@ public class StateMachine
         enterFunc[nowState]();
     }
 
+
+    // 调用方式StartCoroutine(sMachine.ChangeState(xxx,xxx,xxx))
+    // 由于不知道怎么把协程放到字典里，所以目前把wait()放在了这里，讲道理应该放在OnEnter和OnLeave里的
+    // 所以若需要阻塞线程的话就用这个，timeExit是上一个OnLeave的阻塞时间，timeEnter是下一个OnEnter的阻塞时间~
+    public IEnumerator ChangeState(string _newState, float _timeExit, float _timeEnter)
+    {
+        if (!isPlaying)
+        {
+            Debug.LogWarning("状态机还没开启！改变状态无效");
+            yield break;
+        }
+        // 退出当前状态
+        if (!states.Contains(_newState))
+        {
+            Debug.LogError(_newState + "此状态不存在！");
+            yield break;
+        }
+        leaveFunc[nowState]();
+        lastState = nowState;
+        nowState = _newState;
+        if(_timeExit > 0)
+        {
+            yield return new WaitForSeconds(_timeExit);
+        }
+        
+        enterFunc[nowState]();
+
+        if(_timeEnter > 0)
+        {
+            yield return new WaitForSeconds(_timeEnter);
+        }
+        yield break; 
+
+    }
+
     // 开始启动状态机
     public void StartSM()
     {
