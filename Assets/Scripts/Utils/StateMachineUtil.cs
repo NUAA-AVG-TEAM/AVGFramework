@@ -48,11 +48,11 @@ public class StateMachine
             Debug.LogError(_state + "初始化Error!此状态已经存在");
             return;
         }
-        Debug.Log(111);
+        // Debug.Log(111);
         states.Add(_state);
         enterFunc.Add(_state, _enterFunc);
         leaveFunc.Add(_state, _leaveFunc);
-        Debug.Log(222);
+        // Debug.Log(222);
     }
 
     // 改变状态机状态
