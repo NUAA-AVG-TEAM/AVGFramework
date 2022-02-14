@@ -8,24 +8,17 @@ public class GamingGUI : MonoBehaviour
     private static StateMachine sMachine;
     public static GamingGUI GetInstance
     {
+
         get { return instance; }
     }
 
    
-    /*
+    
     private void Awake()
     {
         instance = this;
 
-        // 初始化状态机：
-        sMachine = new StateMachine("GamingGUI");
-        sMachine.AddState("GamingPanel",GamingPanel.GetInstance.OnEnter, GamingPanel.GetInstance.OnLeave);
-        sMachine.AddState("LogPanel", LogPanel.GetInstance.OnEnter, LogPanel.GetInstance.OnLeave);
-
-        sMachine.SetDefaultState("GamingPanel");
-                
     }
-    */
 
     public GameObject GetUIInstance()
     {
