@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using LitJson;
 using DG.Tweening;
+using TMPro;
 public class GamingPanel : MonoBehaviour
 {
     private static GamingPanel instance;
@@ -18,8 +19,8 @@ public class GamingPanel : MonoBehaviour
     private string lang;    //当前的语言
     List<Hashtable> instrPack;  //指令配表
     public Button btn;  //面板上的button
-    public Text dialogText;
-    public Text personName;
+    public TextMeshProUGUI dialogText;
+    public TextMeshProUGUI personName;
     public Button autoBtn;
     public Button saveBtn;
     public Button qSaveBtn;
@@ -47,7 +48,7 @@ public class GamingPanel : MonoBehaviour
 
     private bool isAuto = false; //是否处在自动模式
     private bool isHide = false; //是否处在隐藏模式
-    private GameObject textBg;
+    public GameObject textBg;
     private int nowIndex;
 
     private int sceneIndex;   //当前场景名称的索引
@@ -264,6 +265,7 @@ public class GamingPanel : MonoBehaviour
     {
         instance = this;
         isGaming = false;
+        instrPack = ExcelManager.GetExcel("InstructionPack");
     }
 
     public GameObject GetUIInstance()
@@ -288,9 +290,10 @@ public class GamingPanel : MonoBehaviour
     public void OnEnter()
     {
         // 图片透明度设置成0
-        bg.color = new Color(bg.color.r, bg.color.b, bg.color.a, 0);
+        bg.color = new Color(bg.color.r, bg.color.g, bg.color.b, 0);
         instance.gameObject.SetActive(true);
         bg.DOFade(1, 0.5f);
+        Debug.Log("enter gamingpanel");
         StartCoroutine("GameStart");
         // 提前记录一下设置里有关游戏进行的所有变量~,后补
         isGaming = true;
@@ -373,6 +376,7 @@ public class GamingPanel : MonoBehaviour
     {
         
         string type = _params["type"].ToString().ToUpper();
+        Debug.Log(type);
         Hashtable ht;
         List<string> vt;
         /// <summary>
@@ -537,8 +541,11 @@ public class GamingPanel : MonoBehaviour
         {
             groupIndex = nowIndex;
         }
-  
 
+        // only for test
+        nowIndex = 4;
+
+        // test end
         int nextIndex = nowIndex + 1;
         
 
@@ -594,7 +601,8 @@ public class GamingPanel : MonoBehaviour
         while (nowIndex != 0)
         {
             Hashtable nowInstr = instrPack[nowIndex];
-            nextIndex = (int)nowInstr["nextIndex"];
+            Debug.Log(nowInstr["nextIndex"]);
+            nextIndex = nowInstr["nextIndex"] == null ? nowIndex + 1 : (int)nowInstr["nextIndex"];
             LockButton();
             yield return Execute(nowInstr, isSkip);
             /*

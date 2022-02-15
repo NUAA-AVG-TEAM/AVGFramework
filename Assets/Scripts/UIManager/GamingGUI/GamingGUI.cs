@@ -40,6 +40,7 @@ public class GamingGUI : MonoBehaviour
     /// </summary>
     public void OnEnter()
     {
+        Debug.Log("Enter gamingGUI");
         instance.gameObject.SetActive(true);
         // sMachine.StartSM();
         GamingPanel.GetInstance.OnEnter();

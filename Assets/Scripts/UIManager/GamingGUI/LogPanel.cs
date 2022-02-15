@@ -171,27 +171,27 @@ public class LogPanel : MonoBehaviour
 
     public void ButtonBind()
     {
-        toLogBtn.onClick.AddListener(delegate
+        toLogBtn.onClick.AddListener(delegate()
         {
             Debug.Log("To LogPanel");
             scenePnl.SetActive(false);
             logPnl.SetActive(true);
         });
 
-        toSceneBtn.onClick.AddListener(delegate
+        toSceneBtn.onClick.AddListener(delegate()
         {
             Debug.Log("To ScenePanel");
             scenePnl.SetActive(false);
             logPnl.SetActive(true);
         });
 
-        logBackBtn.onClick.AddListener(delegate
+        logBackBtn.onClick.AddListener(delegate()
         {
             Debug.Log("Log Back");
             OnLeave();
         });
 
-        sceneBackBtn.onClick.AddListener(delegate
+        sceneBackBtn.onClick.AddListener(delegate()
         {
             Debug.Log("Scene Back");
             OnLeave();
