@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using LitJson;
 using DG.Tweening;
+using TMPro;
 public class GamingPanel : MonoBehaviour
 {
     private static GamingPanel instance;
@@ -12,14 +13,14 @@ public class GamingPanel : MonoBehaviour
     private bool isChangeTxtColor;   //是否改变已读文字颜色
     private bool isStopCV;  //点击鼠标时CV是否停止
     private bool isCancelAuto;  //点击鼠标时是否停止自动状态
-    private float textSpeed; //文字显示速度
-    private float autoSpeed;   //auto文字播放速度
+    private float textSpeed = 0.05f; //文字显示速度
+    private float autoSpeed = 0.05f;   //auto文字播放速度
     private bool isFinishCV;    //是否等待CV播放完成了之后再进行下一幕
     private string lang;    //当前的语言
     List<Hashtable> instrPack;  //指令配表
     public Button btn;  //面板上的button
-    public Text dialogText;
-    public Text personName;
+    public TextMeshProUGUI dialogText;
+    public TextMeshProUGUI personName;
     public Button autoBtn;
     public Button saveBtn;
     public Button qSaveBtn;
@@ -47,7 +48,7 @@ public class GamingPanel : MonoBehaviour
 
     private bool isAuto = false; //是否处在自动模式
     private bool isHide = false; //是否处在隐藏模式
-    private GameObject textBg;
+    public GameObject textBg;
     private int nowIndex;
 
     private int sceneIndex;   //当前场景名称的索引
@@ -67,6 +68,7 @@ public class GamingPanel : MonoBehaviour
         sceneIndex = _sceneIndex;
         nowIndex = _sceneIndex;
         groupIndex = 0;
+        LogPanel.GetInstance.OnLeave();
         UIManager.GetInstance.GetSMachine.ChangeState("GamingGUI");
     }
 
@@ -121,6 +123,7 @@ public class GamingPanel : MonoBehaviour
     {
         autoBtn.onClick.AddListener(delegate
         {
+            Debug.Log("auto ->" + !isAuto);
             isAuto = !isAuto;
             // 更改Auto的贴图
         });
@@ -264,6 +267,8 @@ public class GamingPanel : MonoBehaviour
     {
         instance = this;
         isGaming = false;
+        instrPack = ExcelManager.GetExcel("InstructionPack");
+        ButtonBind();
     }
 
     public GameObject GetUIInstance()
@@ -288,9 +293,10 @@ public class GamingPanel : MonoBehaviour
     public void OnEnter()
     {
         // 图片透明度设置成0
-        bg.color = new Color(bg.color.r, bg.color.b, bg.color.a, 0);
+        bg.color = new Color(bg.color.r, bg.color.g, bg.color.b, 0);
         instance.gameObject.SetActive(true);
         bg.DOFade(1, 0.5f);
+        Debug.Log("enter gamingpanel");
         StartCoroutine("GameStart");
         // 提前记录一下设置里有关游戏进行的所有变量~,后补
         isGaming = true;
@@ -373,6 +379,7 @@ public class GamingPanel : MonoBehaviour
     {
         
         string type = _params["type"].ToString().ToUpper();
+        Debug.Log(type);
         Hashtable ht;
         List<string> vt;
         /// <summary>
@@ -402,7 +409,8 @@ public class GamingPanel : MonoBehaviour
         switch (type)
         {
             case "PTX":
-                yield return DialogManager.GetInstance.PlayText(LanguageManager.GetInstance.GetText(_params["ID"].ToString()), isAuto ? autoSpeed : textSpeed);
+                yield return DialogManager.GetInstance.PlayText(LanguageManager.GetInstance.GetText(_params["ID"].ToString()), isAuto ? autoSpeed : textSpeed, isSkip);
+                Debug.Log("play text finish");
                 break;
 
             case "PSE":
@@ -537,8 +545,11 @@ public class GamingPanel : MonoBehaviour
         {
             groupIndex = nowIndex;
         }
-  
 
+        // only for test
+        nowIndex = 4;
+
+        // test end
         int nextIndex = nowIndex + 1;
         
 
@@ -594,7 +605,8 @@ public class GamingPanel : MonoBehaviour
         while (nowIndex != 0)
         {
             Hashtable nowInstr = instrPack[nowIndex];
-            nextIndex = (int)nowInstr["nextIndex"];
+            Debug.Log(nowInstr["nextIndex"]);
+            nextIndex = nowInstr["nextIndex"] == null ? nowIndex + 1 : (int)nowInstr["nextIndex"];
             LockButton();
             yield return Execute(nowInstr, isSkip);
             /*
@@ -615,6 +627,8 @@ public class GamingPanel : MonoBehaviour
             // 当前指令为播放文字指令，此时已播放完文字
             if(nowInstr["type"].ToString().ToUpper() == "PTX")
             {
+                Debug.Log(isSkip);
+                Debug.Log("finish");
                 if (!isSkip)
                 {
                     // _time为自动模式的等待时间
@@ -625,13 +639,17 @@ public class GamingPanel : MonoBehaviour
                     yield return Wait(_time);
                     //若没被打断，且没处于自动模式
                     //处在auto模式下时，不允许隐藏面板
-
+                    Debug.Log(123456);
                     if (!_isClick && !isAuto)
                     {
                         //停止协程直到isAuto,isSkip,isClick有一个为真时
                         btn.onClick.AddListener(GotoNext);
-                        yield return isAuto || isSkip || _isClick;
+                        Debug.Log(isAuto);
+                        Debug.Log(isSkip);
+                        Debug.Log(_isClick || isSkip || _isClick);
+                        yield return WaitForPlayNext();
                         btn.onClick.RemoveListener(GotoNext);
+                        Debug.Log(3456);
                     }
                     if (isFinishCV)
                     {
@@ -678,12 +696,20 @@ public class GamingPanel : MonoBehaviour
         btn.onClick.AddListener(ButtonClick);
         while (!_isClick && i < cycle && !isSkip)
         {
+            Debug.Log(i);
             yield return new WaitForSeconds(itv);
             i++;
         }
         btn.onClick.RemoveListener(ButtonClick);
     }
 
-
+    IEnumerator WaitForPlayNext()
+    {
+        while (!(isAuto || isSkip || _isClick))
+        {
+            yield return 0;
+        }
+        yield break;
+    }
 
 }

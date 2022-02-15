@@ -26,6 +26,7 @@ public class Framework : MonoBehaviour
     }
     private void Start()
     {
+        //oa.SetActive(false);
         mn.SetActive(false);
         gm.SetActive(false);
         st.SetActive(false);
