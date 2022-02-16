@@ -10,6 +10,7 @@ public class AppreciatePanel : BasePanel
 /* DATA */
     
     // panel 预制体位置
+    // commit
     public AppreciatePanel() : base("Prefabs/AppreciateGUIPart/AppreciatePanel") { }
     // CG 部分
     /// CG dic
