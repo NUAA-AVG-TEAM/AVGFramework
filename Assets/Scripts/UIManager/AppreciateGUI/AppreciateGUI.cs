@@ -1,4 +1,4 @@
-ï»¿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,33 +15,30 @@ public class AppreciateGUI : MonoBehaviour
     {
         instance = this;
     }
-    // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     /// <summary>
-    /// UIManagerçŠ¶æ€æœºåˆ‡æ¢åˆ°è¯¥UIæ—¶è§¦å‘
+    /// UIManager×´Ì¬»úÇĞ»»µ½¸ÃUIÊ±´¥·¢
     /// </summary>
     public void OnEnter()
     {
 
     }
-    
+
     /// <summary>
-    /// ä»è¯¥UIåˆ‡æ¢åˆ°å¦ä¸€ä¸ªUIæ—¶è§¦å‘
+    /// ´Ó¸ÃUIÇĞ»»µ½ÁíÒ»¸öUIÊ±´¥·¢
     /// </summary>
     public void OnLeave()
     {
 
     }
-
-
 }

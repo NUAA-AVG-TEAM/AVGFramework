@@ -1,10 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using CoroutineManagement;
+using PanelDisplayManagement;
 
 public class MainGUI : MonoBehaviour
 {
     private static MainGUI instance;
+    private static string targetGUIName = "MainGUI";
 
     public static MainGUI GetInstance
     {
@@ -15,23 +18,16 @@ public class MainGUI : MonoBehaviour
     {
         instance = this;
     }
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
+   
     /// <summary>
     /// UIManager状态机切换到该UI时触发
     /// </summary>
     public void OnEnter()
     {
-
+        // GameObject.Find(targetGUIName).SetActive(true);
+        instance.gameObject.SetActive(true);
+        PanelDisplayManager.GetInstance().SetTartGUI(instance.gameObject);
+        CoroutineManager.GetInstance().StartCoroutine(PanelDisplayManager.GetInstance().Push(new MainPanel()));
     }
 
     /// <summary>

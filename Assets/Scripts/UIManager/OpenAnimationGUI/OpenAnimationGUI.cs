@@ -1,10 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using CoroutineManagement;
+using PanelDisplayManagement;
 
 public class OpenAnimationGUI : MonoBehaviour
 {
     private static OpenAnimationGUI instance;
+    private static string targetGUIName = "OpenAnimationGUI";
 
     public static OpenAnimationGUI GetInstance
     {
@@ -15,23 +18,15 @@ public class OpenAnimationGUI : MonoBehaviour
     {
         instance = this;
     }
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     /// <summary>
     /// UIManager状态机切换到该UI时触发
     /// </summary>
     public void OnEnter()
     {
-        
+        instance.gameObject.SetActive(true);
+        PanelDisplayManager.GetInstance().SetTartGUI(instance.gameObject);
+        CoroutineManager.GetInstance().StartCoroutine(PanelDisplayManager.GetInstance().Push(new OpenAnimationPanel()));
     }
 
     /// <summary>
@@ -39,7 +34,11 @@ public class OpenAnimationGUI : MonoBehaviour
     /// </summary>
     public void OnLeave()
     {
+        PanelDisplayManager.GetInstance().PopAll();
+        PanelDisplayManager.GetInstance().SetTartGUI(null);
 
+        CoroutineManager.GetInstance().StopAllCoroutine();
+        instance.gameObject.SetActive(false);
     }
 
 
