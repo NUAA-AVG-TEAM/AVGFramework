@@ -59,6 +59,7 @@ public class OpenAnimationPanel : BasePanel
     /// <returns></returns>
     private IEnumerator PlayAnimation()
     {
+        nowFrame = 0;
         while ( nowFrame < totalFrame )
         {
             NextFrame();
