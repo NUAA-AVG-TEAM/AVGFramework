@@ -124,11 +124,13 @@ public class AppreciatePanel : BasePanel
             {
                 GameObject newBtnCG = GameObject.Instantiate(Resources.Load<GameObject>(cgButtonPath), cgTable.transform);
                 // 需要做一些初始化工作
+                // ...
                 /// 添加按钮点击事件
                 newBtnCG.GetComponent<Button>().onClick.AddListener(() =>
                 {
                     // 这里添加每个 CG 按钮的点击逻辑
                     Debug.Log("CG");
+                    // CGpanel , CG -- cgToPlay("...")
                 });
                 /// 设置字
                 newBtnCG.GetComponentInChildren<Text>().text = $"id : {id}";

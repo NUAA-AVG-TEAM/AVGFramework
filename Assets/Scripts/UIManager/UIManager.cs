@@ -21,7 +21,7 @@ public class UIManager : MonoBehaviour
         Debug.Log(sMachine);
 
         // 添加状态
-        Debug.Log(OpenAnimationGUI.GetInstance);
+        // Debug.Log(OpenAnimationGUI.GetInstance);
         sMachine.AddState("OpenAnimationGUI", OpenAnimationGUI.GetInstance.OnEnter, OpenAnimationGUI.GetInstance.OnLeave);
         sMachine.AddState("MainGUI", MainGUI.GetInstance.OnEnter, OpenAnimationGUI.GetInstance.OnLeave);
         sMachine.AddState("SaveLoadGUI", SaveLoadGUI.GetInstance.OnEnter, OpenAnimationGUI.GetInstance.OnLeave);

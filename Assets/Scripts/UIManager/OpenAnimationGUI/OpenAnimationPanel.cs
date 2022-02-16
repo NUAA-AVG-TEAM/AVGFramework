@@ -30,10 +30,13 @@ public class OpenAnimationPanel : BasePanel
             GetOrAddComponetInChild<Button>("BtnEnter").onClick.AddListener(() =>
             {
                 Debug.Log("BtnEnter is clicked");
-                // 进入 MAINGUI
+                // 切换 MAINGUI
+                /// 将当前状态下的 panel 全部POP
                 CoroutineManager.GetInstance().StartCoroutine(PanelDisplayManager.GetInstance().Pop());
                 // CoroutineManager.GetInstance().StartCoroutine(PanelDisplayManager.GetInstance().Push(new MainPanel()));
                 UIManager.GetInstance.GetSMachine.ChangeState("MainGUI");
+                // timeexit = 所有东西的减出时间 = PDM.stack.count * ( 1 / speed )
+                // CoroutineManager.GetInstance().StartCoroutine(UIManager.GetInstance.GetSMachine.ChangeState("MainGUI", 1, 0));
             });
         }
     }

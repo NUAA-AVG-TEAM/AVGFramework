@@ -24,7 +24,10 @@ public class OpenAnimationGUI : MonoBehaviour
     /// </summary>
     public void OnEnter()
     {
+        // 开 GUI
         instance.gameObject.SetActive(true);
+
+        // 加入初始的 panel
         PanelDisplayManager.GetInstance().SetTartGUI(instance.gameObject);
         CoroutineManager.GetInstance().StartCoroutine(PanelDisplayManager.GetInstance().Push(new OpenAnimationPanel()));
     }
@@ -34,11 +37,13 @@ public class OpenAnimationGUI : MonoBehaviour
     /// </summary>
     public void OnLeave()
     {
-        PanelDisplayManager.GetInstance().PopAll();
+        // GUI从当前切走
         PanelDisplayManager.GetInstance().SetTartGUI(null);
+        
 
-        CoroutineManager.GetInstance().StopAllCoroutine();
+        // 关 GUI
         instance.gameObject.SetActive(false);
+
     }
 
 

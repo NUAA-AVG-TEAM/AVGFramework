@@ -186,6 +186,11 @@ namespace PanelDisplayManagement
             }
             yield break;
         }
+
+        public void ClearPDM()
+        {
+            // Çå³ý
+        }
     }
 }        
 
