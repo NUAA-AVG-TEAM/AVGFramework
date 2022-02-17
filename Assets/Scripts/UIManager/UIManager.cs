@@ -17,7 +17,6 @@ public class UIManager : MonoBehaviour
     private void Awake()
     {
         instance = this;
-
         sMachine = new StateMachine("UIManager");
         Debug.Log(sMachine);
 
@@ -29,10 +28,11 @@ public class UIManager : MonoBehaviour
         sMachine.AddState("GamingGUI", GamingGUI.GetInstance.OnEnter, OpenAnimationGUI.GetInstance.OnLeave);
         sMachine.AddState("SettingGUI", SettingGUI.GetInstance.OnEnter, OpenAnimationGUI.GetInstance.OnLeave);
         sMachine.AddState("AppreciateGUI", AppreciateGUI.GetInstance.OnEnter, OpenAnimationGUI.GetInstance.OnLeave);
-        
+
         // 设置默认状态
         // 注意要先添加状态再设置默认状态~
-        sMachine.SetDefaultState("OpenAnimationGUI");        
+        sMachine.SetDefaultState("OpenAnimationGUI");
+
     }
     
     public StateMachine GetSMachine
@@ -41,11 +41,14 @@ public class UIManager : MonoBehaviour
     }
     void Start()
     {
+        
         // 开启状态机
+
         sMachine.StartSM();
 
         // 若要改变状态，则先获取状态机 => UIManager.GetInstance.GetSMachine
         // 再执行状态机下的ChangeState函数 => UIManager.GetInstance.GetSMachine.ChangeState("xxx");
+        
     }
 
     // Update is called once per frame

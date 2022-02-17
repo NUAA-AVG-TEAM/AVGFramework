@@ -63,6 +63,7 @@ public class ExcelManager : MonoBehaviour
 
         int columnNum = 0, rowNum = 0;//excel 行数 列数
         DataRowCollection collect = ReadExcel(_filePath, ref columnNum, ref rowNum);
+        UnityEngine.Debug.Log("路径:" + _filePath);
         UnityEngine.Debug.Log(_className + "初始化完毕！");
         PerExcel table = new PerExcel(_className, collect, _type, columnNum, rowNum);
         return table;
