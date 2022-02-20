@@ -21,29 +21,41 @@ public class MainPanel : BasePanel
             GetOrAddComponetInChild<Button>("BtnStart").onClick.AddListener(() =>
             {
                 Debug.Log("BtnStart is clicked");
-                
+                // 切换 GamingGUI
+                /// 将当前状态下的 panel 全部POP
+                CoroutineManager.GetInstance().StartCoroutine(PanelDisplayManager.GetInstance().Pop());
                 // CoroutineManager.GetInstance().StartCoroutine(PanelDisplayManager.GetInstance().Push(new StartPanel()));
+                UIManager.GetInstance.GetSMachine.ChangeState("GamingGUI");
             });
 
             GetOrAddComponetInChild<Button>("BtnLoad").onClick.AddListener(() =>
             {
                 Debug.Log("BtnLoad is clicked");
-                
+                // 切换 GamingGUI
+                /// 将当前状态下的 panel 全部POP
+                CoroutineManager.GetInstance().StartCoroutine(PanelDisplayManager.GetInstance().Pop());
                 // CoroutineManager.GetInstance().StartCoroutine(PanelDisplayManager.GetInstance().Push(new LoadPanel()));
+                UIManager.GetInstance.GetSMachine.ChangeState("GamingGUI");
             });
 
             GetOrAddComponetInChild<Button>("BtnAppreciate").onClick.AddListener(() =>
             {
                 Debug.Log("BtnAppreciate is clicked");
-                
-                CoroutineManager.GetInstance().StartCoroutine(PanelDisplayManager.GetInstance().Push(new AppreciatePanel()));
+                // 切换 AppreciateGUI
+                /// 将当前状态下的 panel 全部POP
+                CoroutineManager.GetInstance().StartCoroutine(PanelDisplayManager.GetInstance().Pop());
+                //CoroutineManager.GetInstance().StartCoroutine(PanelDisplayManager.GetInstance().Push(new AppreciatePanel()));
+                UIManager.GetInstance.GetSMachine.ChangeState("AppreciateGUI");
             });
 
             GetOrAddComponetInChild<Button>("BtnSystem").onClick.AddListener(() =>
             {
                 Debug.Log("BtnSystem is clicked");
-
+                // 切换 SettingGUI
+                /// 将当前状态下的 panel 全部POP
+                CoroutineManager.GetInstance().StartCoroutine(PanelDisplayManager.GetInstance().Pop());
                 // CoroutineManager.GetInstance().StartCoroutine(PanelDisplayManager.GetInstance().Push(new SystemPanel()));
+                UIManager.GetInstance.GetSMachine.ChangeState("SettingGUI");
             });
 
             GetOrAddComponetInChild<Button>("BtnExit").onClick.AddListener(() =>

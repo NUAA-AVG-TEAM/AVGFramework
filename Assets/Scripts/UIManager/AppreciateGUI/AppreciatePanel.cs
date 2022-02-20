@@ -7,11 +7,11 @@ using CoroutineManagement;
 
 public class AppreciatePanel : BasePanel
 {
-/* DATA */
-    
+    /* DATA */
+
     // panel 预制体位置
-    // commit
-    public AppreciatePanel() : base("Prefabs/AppreciateGUIPart/AppreciatePanel") { }
+    // public AppreciatePanel() : base("Prefabs/AppreciateGUIPart/AppreciatePanel") { }
+    public AppreciatePanel() : base("Prefabs/UI/Panel/AppreciatePanel") { }
     // CG 部分
     /// CG dic
     /// ...
@@ -49,6 +49,8 @@ public class AppreciatePanel : BasePanel
             {
                 Debug.Log("BtnExit is clicked");
                 CoroutineManager.GetInstance().StartCoroutine(PanelDisplayManager.GetInstance().Pop());
+                // 返回到MainGUI
+                UIManager.GetInstance.GetSMachine.ChangeState("MainGUI");
             });
         }
 
@@ -131,6 +133,7 @@ public class AppreciatePanel : BasePanel
                 {
                     // 这里添加每个 CG 按钮的点击逻辑
                     Debug.Log("CG");
+                    CoroutineManager.GetInstance().StartCoroutine(PanelDisplayManager.GetInstance().Push(new CGPanel()));
                     // CGpanel , CG -- cgToPlay("...")
                 });
                 /// 设置字

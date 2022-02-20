@@ -35,6 +35,10 @@ public class MainGUI : MonoBehaviour
     /// </summary>
     public void OnLeave()
     {
+        // GUI从当前切走
+        PanelDisplayManager.GetInstance().SetTartGUI(null);
 
+        // 关 GUI
+        instance.gameObject.SetActive(false);
     }
 }
