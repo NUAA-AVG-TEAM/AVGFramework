@@ -1,15 +1,15 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using CoroutineManagement;
 using PanelDisplayManagement;
 
-public class AppreciateGUI : MonoBehaviour
+public class MainGUI : MonoBehaviour
 {
-    private static AppreciateGUI instance;
-    private static string targetGUIName = "AppreciateGUI";
+    private static MainGUI instance;
+    private static string targetGUIName = "MainGUI";
 
-    public static AppreciateGUI GetInstance
+    public static MainGUI GetInstance
     {
         get { return instance; }
     }
@@ -18,39 +18,27 @@ public class AppreciateGUI : MonoBehaviour
     {
         instance = this;
     }
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
+   
     /// <summary>
-    /// UIManager×´Ì¬»úÇĞ»»µ½¸ÃUIÊ±´¥·¢
+    /// UIManagerçŠ¶æ€æœºåˆ‡æ¢åˆ°è¯¥UIæ—¶è§¦å‘
     /// </summary>
     public void OnEnter()
     {
-        // ¿ª GUI
+        // GameObject.Find(targetGUIName).SetActive(true);
         instance.gameObject.SetActive(true);
-
-        // ¼ÓÈë³õÊ¼µÄ panel
         PanelDisplayManager.GetInstance().SetTartGUI(instance.gameObject);
-        CoroutineManager.GetInstance().StartCoroutine(PanelDisplayManager.GetInstance().Push(new AppreciatePanel()));
+        CoroutineManager.GetInstance().StartCoroutine(PanelDisplayManager.GetInstance().Push(new MainPanel()));
     }
 
     /// <summary>
-    /// ´Ó¸ÃUIÇĞ»»µ½ÁíÒ»¸öUIÊ±´¥·¢
+    /// ä»è¯¥UIåˆ‡æ¢åˆ°å¦ä¸€ä¸ªUIæ—¶è§¦å‘
     /// </summary>
     public void OnLeave()
     {
-        // GUI´Óµ±Ç°ÇĞ×ß
+        // GUIä»å½“å‰åˆ‡èµ°
         PanelDisplayManager.GetInstance().SetTartGUI(null);
 
-        // ¹Ø GUI
+        // å…³ GUI
         instance.gameObject.SetActive(false);
     }
 }

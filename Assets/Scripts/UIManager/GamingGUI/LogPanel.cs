@@ -3,6 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+
+/// <summary>
+/// 在这里阐述一下填表的规则
+/// 对于PTX/选择指令，其groupIndex就填对应group的Index
+/// 对于GST指令，其groupIndex填对应的scene的Index
+/// 对于SST指令，其groupIndex填上一个scene的end
+/// 对于SED指令，其groupIndex填这一个scene的SST的Index
+/// 
+/// </summary>
 public class LogPanel : MonoBehaviour
 {
     private static LogPanel instance;
@@ -21,6 +30,7 @@ public class LogPanel : MonoBehaviour
     public Button logBackBtn;   //log上的返回
     public Button sceneBackBtn; //scene上的返回
 
+
     // public Image Bg;
     public Image bgText;    //bgText;
     public Image bg;    //图片的背景，现在先空下
@@ -30,6 +40,10 @@ public class LogPanel : MonoBehaviour
     public Scrollbar barScene;
     private float fadeTime = 0.5f;
     int pageNum;        // 屏幕渲染选项数量
+
+    private int screenWidth;
+    private int screenHeight;
+
 
 
     public static LogPanel GetInstance
@@ -41,6 +55,8 @@ public class LogPanel : MonoBehaviour
     {
         instance = this;
         instrPack = ExcelManager.GetExcel("InstructionPack");
+        screenHeight = Screen.height;
+        screenWidth = Screen.width;
         pageNum = 4;
         ButtonBind();
 
@@ -53,6 +69,39 @@ public class LogPanel : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (screenWidth != Screen.width || screenHeight != Screen.height)
+        {
+            screenWidth = Screen.width;
+            screenHeight = Screen.height;
+            Debug.Log(screenHeight);
+            UpdateScroll();
+            // 触发相应事件~
+        }
+    }
+
+    void UpdateScroll()
+    {
+        // 只有UI打开的时候Update
+        if (!instance.gameObject.activeSelf)
+        {
+            return;
+        }
+        GameObject tmp = logPnl.activeSelf ? logPnl : scenePnl;
+        GameObject tmpContent = logPnl.activeSelf ? logSv : sceneSv;
+        // 本界面的UI全屏
+        tmp.GetComponent<RectTransform>().sizeDelta = new Vector2(screenWidth, screenHeight);
+
+        // content的子节点更改, 后续优化
+        int len = tmpContent.transform.childCount;
+        tmpContent.GetComponent<RectTransform>().sizeDelta = new Vector2(tmpContent.GetComponent<RectTransform>().sizeDelta.x, len * Screen.height / (float)pageNum);
+        for (int i = 0; i < len; i++)
+        {
+            tmpContent.transform.GetChild(i).GetComponent<RectTransform>().localPosition = new Vector2(Screen.width / 2, -(i * Screen.height / (float)pageNum));
+            tmpContent.transform.GetChild(i).GetComponent<RectTransform>().sizeDelta = new Vector2(Screen.width, Screen.height / (float)pageNum);
+            // Debug.Log("localposition" + i + content.transform.GetChild(i).GetComponent<RectTransform>().localPosition);
+            // Debug.Log("position" + i + content.transform.GetChild(i).GetComponent<RectTransform>().position);
+        }
+
 
     }
 
@@ -84,6 +133,7 @@ public class LogPanel : MonoBehaviour
                 tmp.index = i;
                 tmp.ID = instrPack[i]["ID"].ToString();
                 sGroup.Push(tmp);
+                Debug.Log(tmp.ID);
                 
             }
             else if(tp == "GST")
@@ -103,7 +153,7 @@ public class LogPanel : MonoBehaviour
             {
                 break;
             }
-            if (instrPack[i]["groupIndex"] != null)
+            if (instrPack[i]["groupIndex"] != null && tp != "PTX")
             {
                 i = (int)instrPack[i]["groupIndex"];
             }
@@ -114,6 +164,8 @@ public class LogPanel : MonoBehaviour
         }
 
         int tmpi = sGroup.Count;
+        int gCnt = tmpi;
+        int sCnt = sScene.Count;
         // 退栈，开始渲染面板
         while(tmpi > 0)
         {
@@ -121,32 +173,42 @@ public class LogPanel : MonoBehaviour
             LogMessage tmp = sGroup.Pop();
             Debug.Log(tmp.ID);
             GameObject obj = Instantiate(prefabsPanel, logSv.transform);
+            obj.GetComponent<RectTransform>().localPosition = new Vector2(Screen.width / 2, -((gCnt - tmpi) * Screen.height / (float)pageNum));
+            Debug.Log(obj.GetComponent<RectTransform>().localPosition);
+            Debug.Log(obj.GetComponent<RectTransform>().position);
+            obj.GetComponent<RectTransform>().sizeDelta = new Vector2(screenWidth, (Screen.height / (float)pageNum));
             string tmps = tmp.ID;
             obj.transform.Find("Text").GetComponent<TMPro.TextMeshProUGUI>().text = LanguageManager.GetInstance.GetText(tmps);
             // 绑定跳转事件
             tmpi--;
             obj.transform.Find("Button").GetComponent<Button>().onClick.AddListener(delegate
-                {
-                    Debug.Log("Jumptolog");
-                    // 加一个显示UI事件，逻辑是生成一个UI并显示，这个UI的逻辑也需要绑定~，后补
-                    GamingPanel.GetInstance.JumpScene(tmp.index);
-                }
+            {
+                Debug.Log("Jumptolog");
+                // 加一个显示UI事件，逻辑是生成一个UI并显示，这个UI的逻辑也需要绑定~，后补
+                GamingPanel.GetInstance.JumpScene((int)instrPack[(int)instrPack[tmp.index]["groupIndex"]]["groupIndex"], (int)instrPack[tmp.index]["groupIndex"], tmp.index);
+            }
             );
 
         }
-        while (sScene.Count > 0)
+        tmpi = sScene.Count;
+        while (tmpi > 0)
         {
             
             LogMessage tmp = sScene.Pop();
             GameObject obj = Instantiate(prefabsPanel, sceneSv.transform);
+            obj.GetComponent<RectTransform>().localPosition = new Vector2(Screen.width / 2, -((sCnt - tmpi) * Screen.height / (float)pageNum));
+            // Debug.Log(obj.GetComponent<RectTransform>().localPosition);
+            // Debug.Log(obj.GetComponent<RectTransform>().position);
+            obj.GetComponent<RectTransform>().sizeDelta = new Vector2(screenWidth, (Screen.height / (float)pageNum));
             string tmps = tmp.ID;
+            tmpi--;
             obj.transform.Find("Text").GetComponent<TMPro.TextMeshProUGUI>().text = LanguageManager.GetInstance.GetText(tmps);
             // 绑定跳转事件
             obj.transform.Find("Button").GetComponent<Button>().onClick.AddListener(delegate
             {
                 Debug.Log("JumptoScene");
                 // 加一个显示UI事件，逻辑是生成一个UI并显示，这个UI的逻辑也需要绑定~，后补
-                GamingPanel.GetInstance.JumpScene(tmp.index);
+                GamingPanel.GetInstance.JumpScene(tmp.index, tmp.index, tmp.index);
             }
             );
 
@@ -232,6 +294,7 @@ public class LogPanel : MonoBehaviour
             instance.gameObject.SetActive(false);
             //把组件下的所有东西去掉，
             FunctionUtil.RemoveChildren(logSv.transform);
+            FunctionUtil.RemoveChildren(sceneSv.transform);
         });
 
         
