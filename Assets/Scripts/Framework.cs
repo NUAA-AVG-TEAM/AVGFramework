@@ -16,9 +16,9 @@ public class Framework : MonoBehaviour
     public GameObject ldp;  // load panel
     public GameObject sp;   // save panel
     public GameObject qp;   // qload panel
-    public GameObject mp;   // main panel
-    public GameObject cgp;  // cg panel
-    public GameObject bp;   // bgm panel
+    //public GameObject mp;   // main panel
+    //public GameObject cgp;  // cg panel
+    //public GameObject bp;   // bgm panel
     private void Awake()
     {
         //oa.SetActive(false);
@@ -26,21 +26,21 @@ public class Framework : MonoBehaviour
     }
     private void Start()
     {
-        oa.SetActive(false);
+        //oa.SetActive(false);
         mn.SetActive(false);
-        //gm.SetActive(false);
+        gm.SetActive(false);
         st.SetActive(false);
         sl.SetActive(false);
         ac.SetActive(false);
 
-        //gp.SetActive(false);
+        gp.SetActive(false);
         lp.SetActive(false);
         cp.SetActive(false);
         ldp.SetActive(false);
         sp.SetActive(false);
         qp.SetActive(false);
-        mp.SetActive(false);
-        cgp.SetActive(false);
-        bp.SetActive(false);
+        //mp.SetActive(false);
+        //cgp.SetActive(false);
+        //bp.SetActive(false);
     }
 }
