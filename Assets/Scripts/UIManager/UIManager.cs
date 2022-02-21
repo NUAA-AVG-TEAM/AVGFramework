@@ -31,7 +31,7 @@ public class UIManager : MonoBehaviour
 
         // 设置默认状态
         // 注意要先添加状态再设置默认状态~
-        sMachine.SetDefaultState("OpenAnimationGUI");
+        sMachine.SetDefaultState("GamingGUI");
 
     }
     

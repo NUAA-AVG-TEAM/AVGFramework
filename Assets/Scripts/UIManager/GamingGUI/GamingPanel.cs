@@ -32,27 +32,108 @@ public class GamingPanel : MonoBehaviour
     public Button logBtn;
     public Button settingBtn;
     public Button hideBtn;
+    public GameObject btnsPanel;
     private bool _isClick;
     private bool isSkip = false;  //是否处在跳过模式
     private int msg = 0;
     private bool IsSkip
     {
+        // skip模式下，除了hide，均无法点击
         set
         {
             isSkip = value;
             //补改贴图逻辑
+            if(value)
+            {
+                saveBtn.interactable = false;
+                qSaveBtn.interactable = false;
+                qLoadBtn.interactable = false;
+                loadBtn.interactable = false;
+                nextSceneBtn.interactable = false;
+                lastSceneBtn.interactable = false;
+                hideBtn.interactable = false;
+                logBtn.interactable = false;
+                settingBtn.interactable = false;
+                autoBtn.interactable = false;
+            }
+            else
+            {
+                saveBtn.interactable = !isSkip && !isAuto;
+                qSaveBtn.interactable = !isSkip && !isAuto;
+                qLoadBtn.interactable = !isSkip && !isAuto;
+                loadBtn.interactable = !isSkip && !isAuto;
+                nextSceneBtn.interactable = !isSkip && !isAuto;
+                lastSceneBtn.interactable = !isSkip && !isAuto;
+                hideBtn.interactable = !isSkip && !isAuto;
+                logBtn.interactable = !isSkip && !isAuto;
+                settingBtn.interactable = !isSkip && !isAuto;
+                autoBtn.interactable = true;
+            }
         }
 
     }
 
+    private bool IsHide
+    {
+        set
+        {
+            isHide = value;
+            textBg.SetActive(!value);
+            btnsPanel.SetActive(!value);
+            
+        }
+    }
+
+    private bool IsAuto
+    {
+        set
+        {
+            isAuto = value;
+            // 更改isAuto贴图
+
+            //设置isHide按钮交互性
+            // hideBtn.interactable = !value;
+            /// auto模式下，除了auto和hide，均无法点击
+            if(value)
+            {
+                saveBtn.interactable = false;
+                qSaveBtn.interactable = false;
+                qLoadBtn.interactable = false;
+                loadBtn.interactable = false;
+                nextSceneBtn.interactable = false;
+                lastSceneBtn.interactable = false;
+                hideBtn.interactable = false;
+                logBtn.interactable = false;
+                settingBtn.interactable = false;
+            }
+            else
+            {
+                saveBtn.interactable = !isSkip && !isAuto;
+                qSaveBtn.interactable = !isSkip && !isAuto;
+                qLoadBtn.interactable = !isSkip && !isAuto;
+                loadBtn.interactable = !isSkip && !isAuto;
+                nextSceneBtn.interactable = !isSkip && !isAuto;
+                lastSceneBtn.interactable = !isSkip && !isAuto;
+                hideBtn.interactable = !isSkip && !isAuto;
+                logBtn.interactable = !isSkip && !isAuto;
+                settingBtn.interactable = !isSkip && !isAuto;
+            }
+
+        }
+    }
+
 
     private bool isAuto = false; //是否处在自动模式
+    /// <summary>
+    /// 若处在自动模式，此时hide按钮不可点击
+    /// 若不处在自动模式，hide按钮在合法的情况下可点击
+    /// </summary>
     private bool isHide = false; //是否处在隐藏模式
     public GameObject textBg;
     private int nowIndex;
 
-    private int sceneIndex;   //当前场景名称的索引
-    private int groupIndex;   //当前指令对话所在组的位置
+    private int sceneIndex;   //当前场景名称的索引, 用于存档中拿场景名称
+    private int groupIndex;   //当前指令对话所在组的位置，读档时从某组开始，先快速执行到nowIndex前一条指令，再StartCoroutine
 
     private bool isGaming;
 
@@ -63,11 +144,14 @@ public class GamingPanel : MonoBehaviour
         get { return instance; }
     }
 
-    public void JumpScene(int _sceneIndex)
+    public void JumpScene(int _sceneIndex, int _groupIndex, int _nowIndex)
     {
+        Debug.Log("sceneIndex" + _sceneIndex);
+        Debug.Log("groupIndex" + _groupIndex);
+        Debug.Log("nowIndex" + _nowIndex);
         sceneIndex = _sceneIndex;
-        nowIndex = _sceneIndex;
-        groupIndex = 0;
+        nowIndex = _nowIndex;
+        groupIndex = _groupIndex;
         LogPanel.GetInstance.OnLeave();
         UIManager.GetInstance.GetSMachine.ChangeState("GamingGUI");
     }
@@ -124,7 +208,7 @@ public class GamingPanel : MonoBehaviour
         autoBtn.onClick.AddListener(delegate
         {
             Debug.Log("auto ->" + !isAuto);
-            isAuto = !isAuto;
+            IsAuto = !isAuto;
             // 更改Auto的贴图
         });
 
@@ -169,14 +253,22 @@ public class GamingPanel : MonoBehaviour
                 if (instrPack[i]["type"].ToString().ToUpper() == "GST")
                 {
                     groupnum++;
+                    
+                    i = (instrPack[i]["groupIndex"] == null) ? (i - 1) : (int)instrPack[i]["groupIndex"];
+                    Debug.Log(i);
+                   
                 }
                 // 场景开始，且不是第一句话
                 else if (instrPack[i]["type"].ToString().ToUpper() == "SST")
                 {
                     if (groupnum > 1)
                     {
-                        JumpScene(i);
+                        JumpScene(i, i, i);
                         break;
+                    }
+                    else
+                    {
+                        i = (instrPack[i]["groupIndex"] == null) ? (i - 1) : (int)instrPack[i]["groupIndex"];
                     }
                 }
                 // 场景结束，直接跳到该场景开始的位置
@@ -184,7 +276,7 @@ public class GamingPanel : MonoBehaviour
                 else if (instrPack[i]["type"].ToString().ToUpper() == "SED")
                 {
                     // 在这里找一下Index即可~
-                    JumpScene((int)instrPack[i]["groupIndex"]);
+                    JumpScene((int)instrPack[i]["groupIndex"], (int)instrPack[i]["groupIndex"], (int)instrPack[i]["groupIndex"]);
                     break;
                 }
                 // 章节开始，不能跳
@@ -197,6 +289,8 @@ public class GamingPanel : MonoBehaviour
                 else
                 {
                     i = (instrPack[i]["groupIndex"] == null) ? (i - 1) : (int)instrPack[i]["groupIndex"];
+                    Debug.Log(i);
+                    
                 }
             }
         });
@@ -208,7 +302,7 @@ public class GamingPanel : MonoBehaviour
                 // 场景开始
                 if (instrPack[i]["type"].ToString().ToUpper() == "SST")
                 {
-                    JumpScene(i);
+                    JumpScene(i, i, i);
                     break;
                 }
                 // 章节结束，不能跳
@@ -243,7 +337,8 @@ public class GamingPanel : MonoBehaviour
 
         hideBtn.onClick.AddListener(delegate
         {
-            textBg.SetActive(false);
+            IsHide = !isHide;
+            
             // 后补按钮SetActiveFalse
 
         });
@@ -259,6 +354,13 @@ public class GamingPanel : MonoBehaviour
         {
 
         };
+
+        UIEventListener hideListener = hideBtn.gameObject.AddComponent<UIEventListener>();
+        hideListener.OnMouseEnter += delegate (GameObject _object)
+        {
+            
+        };
+
 
         
 
@@ -289,11 +391,21 @@ public class GamingPanel : MonoBehaviour
 
     /// <summary>
     /// GamingGUI状态机切换到该UI时触发
+    /// 目前的逻辑：先根据传进来的groupIndex和nowIndex(事先初始化好)还原之前的场景，对应的是RestoreGame()，逻辑就是执行groupIndex到nowIndex的部分指令
+    /// 再开UI
+    /// 再StartCoroutine
+    /// 
+    /// 从存档来/继续游戏：存档里事先会存groupIndex和nowIndex，根据存档里的这个东西存就行
+    /// 开始游戏：nowIndex = groupIndex = 4即可
+    /// 从记录里来：场景好办，groupIndex = sceneIndex = nowIndex即可
+    /// 跳转相应文字：因为Instruction表里有对应的groupIndex，拿这个groupIndex还原当前的groupIndex即可，然后nowIndex正常赋值
     /// </summary>
     public void OnEnter()
     {
         // 图片透明度设置成0
         bg.color = new Color(bg.color.r, bg.color.g, bg.color.b, 0);
+        // 根据传进来的groupIndex&nowIndex执行指令，还原当前背景，实际上是执行groupIndex到nowIndex的部分指令
+        RestoreGame();
         instance.gameObject.SetActive(true);
         bg.DOFade(1, 0.5f);
         Debug.Log("enter gamingpanel");
@@ -302,6 +414,68 @@ public class GamingPanel : MonoBehaviour
         isGaming = true;
 
 
+    }
+
+    void RestoreGame()
+    {
+        int tmpIndex = groupIndex;
+        Hashtable ht;
+        List<string> vt;
+        while(tmpIndex < nowIndex)
+        {
+            string _type = instrPack[tmpIndex]["type"].ToString().ToUpper();
+
+            switch(_type)
+            {
+                case "CBG":
+                    BgManager.GetInstance.ChangeBg(instrPack[tmpIndex]["ID"].ToString());
+                    break;
+
+                case "MBG":
+                    ht = JsonMapper.ToObject<Hashtable>(instrPack[tmpIndex]["params"].ToString());
+                    BgManager.GetInstance.MoveBg((int)ht["type"]);
+                    break;
+
+                case "PVD":
+                    //////VideoManager.GetInstance.PlayVideo(_params["ID"].ToString());
+                    break;
+
+                case "SVD":
+                    //////VideoManager.GetInstance.StopVideo(_params["ID"].ToString());
+                    break;
+
+
+                /// 创建立绘的时候一个一个创，创的是节点
+                /// 删的时候也一个一个删，但是改变的时候就是一起改变= =
+                case "CSP":
+                    ht = JsonMapper.ToObject<Hashtable>(instrPack[tmpIndex]["params"].ToString());
+                    // 先这么写着，之后再沟通
+                    ////// SpriteManager.GetInstance.CreateSprite(_params["ID"], ht["name"].ToString(), ht, isSkip);
+                    break;
+
+                case "DSP":
+                    ht = JsonMapper.ToObject<Hashtable>(instrPack[tmpIndex]["params"].ToString());
+                    // 先这么写着，之后再沟通
+                    ////// SpriteManager.GetInstance.DeleteSprite(_params["ID"], isSkip);
+                    break;
+
+                case "MSP":
+                    ht = JsonMapper.ToObject<Hashtable>(instrPack[tmpIndex]["params"].ToString());
+                    // 先这么写着，之后再沟通
+                    vt = JsonMapper.ToObject<List<string>>(instrPack[tmpIndex]["ID"].ToString());
+                    ////// SpriteManager.GetInstance.MoveSprite(vt, ht["name"].ToString(), ht, isSkip);
+                    break;
+
+                case "CGSP":
+                    ht = JsonMapper.ToObject<Hashtable>(instrPack[tmpIndex]["params"].ToString());
+                    // 先这么写着，之后再沟通
+                    vt = JsonMapper.ToObject<List<string>>(instrPack[tmpIndex]["ID"].ToString());
+                    ////// SpriteManager.GetInstance.ChangeSprite(vt, ht["name"].ToString(), ht, ht["dout"], isSkip);
+                    break;
+
+            }
+            tmpIndex++;
+        }
     }
 
     /// <summary>
@@ -336,6 +510,11 @@ public class GamingPanel : MonoBehaviour
     public void SetSceneIndex(int _sceneIndex)
     {
         sceneIndex = _sceneIndex;
+    }
+
+    public void SetGroupIndex(int _index)
+    {
+        groupIndex = _index;
     }
 
     
@@ -516,9 +695,9 @@ public class GamingPanel : MonoBehaviour
     bool ClickEvent()
     {
         // 若背景未打开，先打开背景和所有按钮
-        if(!textBg.activeSelf)
+        if(isHide)
         {
-            textBg.SetActive(true);
+            IsHide = false;
             return false;
         }
 
@@ -529,7 +708,7 @@ public class GamingPanel : MonoBehaviour
         }
         if (isCancelAuto)
         {
-            isAuto = false;
+            IsAuto = false;
         }
         return true;
 
@@ -541,10 +720,14 @@ public class GamingPanel : MonoBehaviour
         // 需保证在执行协程之前，这些变量均初始化好，后补健壮处理
         // 假如是存档 / 继续游戏/ 开始游戏进来的，需要重置，重置前默认把groupIndex重置成0即可
         // 否则目前的状态可以利用，groupindex不用重置
+        /*
         if (groupIndex == 0)
         {
             groupIndex = nowIndex;
         }
+        */
+
+        
 
         // only for test
         nowIndex = 4;
@@ -571,35 +754,37 @@ public class GamingPanel : MonoBehaviour
         }
 
         void LockButton()
-        {
-            autoBtn.interactable = false;
-            saveBtn.interactable = false;
-            qSaveBtn.interactable = false;
-            loadBtn.interactable = false;
-            qLoadBtn.interactable = false;
-            lastSceneBtn.interactable = false;
-            nextSceneBtn.interactable = false;
-            skipBtn.interactable = false;
-            logBtn.interactable = false;
-            settingBtn.interactable = false;
-            hideBtn.interactable = false;
+        { 
+            autoBtn.enabled = false;
+            saveBtn.enabled = false;
+            qSaveBtn.enabled = false;
+            loadBtn.enabled = false;
+            qLoadBtn.enabled = false;
+            lastSceneBtn.enabled = false;
+            nextSceneBtn.enabled = false;
+
+            skipBtn.enabled = false;
+            logBtn.enabled = false;
+            settingBtn.enabled = false;
+            hideBtn.enabled = false;
             
                 
         }
 
         void UnLockButton()
         {
-            autoBtn.interactable = true;
-            saveBtn.interactable = true;
-            qSaveBtn.interactable = true;
-            loadBtn.interactable = true;
-            qLoadBtn.interactable = true;
-            lastSceneBtn.interactable = true;
-            nextSceneBtn.interactable = true;
-            skipBtn.interactable = true;
-            logBtn.interactable = true;
-            settingBtn.interactable = true;
-            hideBtn.interactable = true;
+            autoBtn.enabled = true;
+            saveBtn.enabled = true;
+            qSaveBtn.enabled = true;
+            loadBtn.enabled = true;
+            qLoadBtn.enabled = true;
+            lastSceneBtn.enabled = true;
+            nextSceneBtn.enabled = true;
+            skipBtn.enabled = true;
+            logBtn.enabled = true;
+            settingBtn.enabled = true;
+            hideBtn.enabled = true;
+            
         }
         btn.onClick.AddListener(StopSkip);
         while (nowIndex != 0)
@@ -619,9 +804,9 @@ public class GamingPanel : MonoBehaviour
             }
             */
             // 留个坑，记得把面板打开
-            if(!textBg.activeSelf)
+            if(isHide)
             {
-                textBg.SetActive(true);
+                IsHide = false;
             }
 
             // 当前指令为播放文字指令，此时已播放完文字
@@ -632,8 +817,9 @@ public class GamingPanel : MonoBehaviour
                 if (!isSkip)
                 {
                     // _time为自动模式的等待时间
-                    int _time = 1;
+                    int _time = 3;
                     UnLockButton();
+                    Debug.Log("解锁按钮！");
                     // btn.onClick.AddListener(StopSkip);
                     _isClick = false;
                     yield return Wait(_time);
@@ -644,9 +830,6 @@ public class GamingPanel : MonoBehaviour
                     {
                         //停止协程直到isAuto,isSkip,isClick有一个为真时
                         btn.onClick.AddListener(GotoNext);
-                        Debug.Log(isAuto);
-                        Debug.Log(isSkip);
-                        Debug.Log(_isClick || isSkip || _isClick);
                         yield return WaitForPlayNext();
                         btn.onClick.RemoveListener(GotoNext);
                         Debug.Log(3456);

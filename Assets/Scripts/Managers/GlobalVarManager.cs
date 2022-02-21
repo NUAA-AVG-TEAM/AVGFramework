@@ -89,7 +89,7 @@ public class GlobalVarManager : MonoBehaviour
         }
         Debug.Log("存档内容为:");
         Debug.Log(tmp);
-        string tempPath = Application.persistentDataPath + "/Save/temp.json";
+        string tempPath = Application.dataPath + "/Save/temp.json";
         FileStream file = File.Open(tempPath, FileMode.OpenOrCreate);
         StreamWriter sw = new StreamWriter(file);
         sw.WriteLine(tmp);
@@ -103,7 +103,7 @@ public class GlobalVarManager : MonoBehaviour
     void RestoreData()
     {
         Debug.Log("准备读取存档....");
-        string tempPath = Application.persistentDataPath + "/Save/temp.json";
+        string tempPath = Application.dataPath + "/Save/temp.json";
         if (!File.Exists(tempPath))
         {
             SaveData(0);

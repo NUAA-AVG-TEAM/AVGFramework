@@ -26,14 +26,14 @@ public class Framework : MonoBehaviour
     }
     private void Start()
     {
-        //oa.SetActive(false);
+        oa.SetActive(false);
         mn.SetActive(false);
-        gm.SetActive(false);
+        //gm.SetActive(false);
         st.SetActive(false);
         sl.SetActive(false);
         ac.SetActive(false);
 
-        gp.SetActive(false);
+        //gp.SetActive(false);
         lp.SetActive(false);
         cp.SetActive(false);
         ldp.SetActive(false);
