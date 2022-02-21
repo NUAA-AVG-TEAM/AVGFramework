@@ -294,6 +294,7 @@ public class LogPanel : MonoBehaviour
             instance.gameObject.SetActive(false);
             //把组件下的所有东西去掉，
             FunctionUtil.RemoveChildren(logSv.transform);
+            FunctionUtil.RemoveChildren(sceneSv.transform);
         });
 
         
