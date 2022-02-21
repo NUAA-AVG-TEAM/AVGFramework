@@ -21,7 +21,12 @@ public class Framework : MonoBehaviour
     public GameObject bp;   // bgm panel
     private void Awake()
     {
-        oa.SetActive(false);
+        //oa.SetActive(false);
+        
+    }
+    private void Start()
+    {
+        //oa.SetActive(false);
         mn.SetActive(false);
         gm.SetActive(false);
         st.SetActive(false);

@@ -32,6 +32,7 @@ public class VideoManager : MonoBehaviour
         vp.Prepare();
         Debug.Log("Video Prepared and Play");
         vp.Play();
+        
     }
 
     public void StopVideo(string _name,UnityEngine.Video.VideoPlayer vp)

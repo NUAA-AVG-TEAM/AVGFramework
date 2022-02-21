@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
+using DG.Tweening;
 public class LogPanel : MonoBehaviour
 {
     private static LogPanel instance;
@@ -21,6 +21,14 @@ public class LogPanel : MonoBehaviour
     public Button logBackBtn;   //log上的返回
     public Button sceneBackBtn; //scene上的返回
 
+    // public Image Bg;
+    public Image bgText;    //bgText;
+    public Image bg;    //图片的背景，现在先空下
+    public Image btnsPanel;    //按钮面板 不用panel，获取不到太蛋疼了
+
+    public Scrollbar barLog;    //滚动条
+    public Scrollbar barScene;
+    private float fadeTime = 0.5f;
     int pageNum;        // 屏幕渲染选项数量
 
 
@@ -86,7 +94,9 @@ public class LogPanel : MonoBehaviour
             {
                 LogMessage tmp = new LogMessage();
                 tmp.index = i;
-                tmp.ID = instrPack[i]["ID"].ToString();
+                Debug.Log(instrPack[i]["ID"]);
+
+                tmp.ID = instrPack[i]["ID"] == null ? "" : instrPack[i]["ID"].ToString();
                 sScene.Push(tmp);
             }
             else if(tp == "CST")
@@ -103,15 +113,21 @@ public class LogPanel : MonoBehaviour
             }
         }
 
+        int tmpi = sGroup.Count;
         // 退栈，开始渲染面板
-        while(sGroup.Count > 0)
+        while(tmpi > 0)
         {
+            Debug.Log(sGroup.Count);
             LogMessage tmp = sGroup.Pop();
+            Debug.Log(tmp.ID);
             GameObject obj = Instantiate(prefabsPanel, logSv.transform);
-            obj.transform.Find("Text").GetComponent<Text>().text = LanguageManager.GetInstance.GetText(tmp.ID);
+            string tmps = tmp.ID;
+            obj.transform.Find("Text").GetComponent<TMPro.TextMeshProUGUI>().text = LanguageManager.GetInstance.GetText(tmps);
             // 绑定跳转事件
+            tmpi--;
             obj.transform.Find("Button").GetComponent<Button>().onClick.AddListener(delegate
                 {
+                    Debug.Log("Jumptolog");
                     // 加一个显示UI事件，逻辑是生成一个UI并显示，这个UI的逻辑也需要绑定~，后补
                     GamingPanel.GetInstance.JumpScene(tmp.index);
                 }
@@ -120,12 +136,15 @@ public class LogPanel : MonoBehaviour
         }
         while (sScene.Count > 0)
         {
+            
             LogMessage tmp = sScene.Pop();
-            GameObject obj = Instantiate(prefabsPanel, logSv.transform);
-            obj.transform.Find("Text").GetComponent<Text>().text = LanguageManager.GetInstance.GetText(tmp.ID);
+            GameObject obj = Instantiate(prefabsPanel, sceneSv.transform);
+            string tmps = tmp.ID;
+            obj.transform.Find("Text").GetComponent<TMPro.TextMeshProUGUI>().text = LanguageManager.GetInstance.GetText(tmps);
             // 绑定跳转事件
             obj.transform.Find("Button").GetComponent<Button>().onClick.AddListener(delegate
             {
+                Debug.Log("JumptoScene");
                 // 加一个显示UI事件，逻辑是生成一个UI并显示，这个UI的逻辑也需要绑定~，后补
                 GamingPanel.GetInstance.JumpScene(tmp.index);
             }
@@ -136,40 +155,58 @@ public class LogPanel : MonoBehaviour
 
     }
 
-    public void OnEnter()
+    public IEnumerator OnEnter()
     {
         //解绑事件
         GamingPanel.GetInstance.KeyboardUnBind();
         //先渲染画面
 
         RenderPanel();
+        //将滚动条调到最下方~
+        barLog.value = 0;
+        barScene.value = 0;
+
+        //等一帧才会刷新~
+        yield return new WaitForEndOfFrame();
+        //首先将自己的透明度调成0
+        // bg.color = new Color(bg.color.r, bg.color.g, bg.color.b, bg.color.a);
+        btnsPanel.color = new Color(btnsPanel.color.r, btnsPanel.color.g, btnsPanel.color.b, btnsPanel.color.a);
         instance.gameObject.SetActive(true);
         logPnl.SetActive(true);
+        //将背景版透明度调成0,自己透明度调成1
+        bgText.DOFade(0, fadeTime);
+        btnsPanel.DOFade(0, fadeTime);
+        bg.DOFade(1, fadeTime);
+        yield break;
     }
 
     public void ButtonBind()
     {
-        toLogBtn.onClick.AddListener(delegate
+        toLogBtn.onClick.AddListener(delegate()
         {
             Debug.Log("To LogPanel");
             scenePnl.SetActive(false);
             logPnl.SetActive(true);
+
+
         });
 
-        toSceneBtn.onClick.AddListener(delegate
+        toSceneBtn.onClick.AddListener(delegate()
         {
             Debug.Log("To ScenePanel");
-            scenePnl.SetActive(false);
-            logPnl.SetActive(true);
+           
+
+            logPnl.SetActive(false);
+            scenePnl.SetActive(true);
         });
 
-        logBackBtn.onClick.AddListener(delegate
+        logBackBtn.onClick.AddListener(delegate()
         {
             Debug.Log("Log Back");
             OnLeave();
         });
 
-        sceneBackBtn.onClick.AddListener(delegate
+        sceneBackBtn.onClick.AddListener(delegate()
         {
             Debug.Log("Scene Back");
             OnLeave();
@@ -182,8 +219,23 @@ public class LogPanel : MonoBehaviour
     /// </summary>
     public void OnLeave()
     {
-        scenePnl.SetActive(false);
-        logPnl.SetActive(false);
+
+
+
+        //将背景版透明度调成0,自己透明度调成1
+        // 记得加一个canvas group~
+        bgText.DOFade(1, fadeTime);
+        btnsPanel.DOFade(1, fadeTime);
+        bg.DOFade(0, fadeTime).OnComplete(()=> {
+            scenePnl.SetActive(false);
+            logPnl.SetActive(false);
+            instance.gameObject.SetActive(false);
+            //把组件下的所有东西去掉，
+            FunctionUtil.RemoveChildren(logSv.transform);
+        });
+
+        
+        
         // 绑定事件
         GamingPanel.GetInstance.KeyboardBind();
         

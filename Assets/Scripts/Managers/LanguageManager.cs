@@ -45,6 +45,7 @@ public class LanguageManager : MonoBehaviour
         end
         return text
         */
+        Debug.Log(_id);
         if (string.IsNullOrWhiteSpace(_id))
         {
             Debug.LogError("翻译ID为空，请检查策划表和LanguagePack");

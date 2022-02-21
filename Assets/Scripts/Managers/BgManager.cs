@@ -12,6 +12,9 @@ public class BgManager : MonoBehaviour
     public int TargetNum;
     public float TargetTime;
     private string Path;
+
+    private string NowPath;
+
     public static BgManager GetInstance
     {
         get { return instance; }
@@ -30,6 +33,7 @@ public class BgManager : MonoBehaviour
         TargetNum = 1;
         TargetTime = 1;
         Path = " ";//需要改成图片文件夹的路径+//
+        NowPath = "";
     }
 
     public IEnumerator ChangeBg(string _newBg)
@@ -45,16 +49,30 @@ public class BgManager : MonoBehaviour
         Sprite spr = Sprite.Create(_tex,new Rect(0,0,_tex.width,_tex.height),new Vector2(0.5f,0.5f));
         Bg.sprite = spr;
         yield return spr;
+        if(NowPath!=path)
+        {
+            Bg.sprite = spr;
+            NowPath = path; 
+        }
+        yield return spr;  
     }
     public void MoveBg(int _type)
     {
-
+        //不知道要写成啥样子
     }
 
     public void DeleteBg()
     {
-
+        //只是把当前的图片变成透明的了。
+        Color DelColor = new Color(0,0,0,0);
+        Bg.color = DelColor;
     }
+    public void ReturnBg()
+    {
+        Color RetColor = new Color(255,255,255,1);//可自行修改
+        Bg.color = RetColor;
+    }
+
     /*private void pellUp(){
         Color DeltaColor = new Color(0,0,0,0.2);
         float Ctime;
@@ -81,4 +99,7 @@ public class BgManager : MonoBehaviour
             }
         }
     }*/
+
 }
+
+
