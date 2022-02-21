@@ -36,7 +36,7 @@ public class PerExcel
                 Hashtable row = new Hashtable();
                 for (int j = 0; j < _colNum; j++)
                 {
-                    row.Add(_pack[1][j], GetValue(_pack[0][j].ToString(), _pack[i][j]));
+                    row.Add(_pack[1][j].ToString(), GetValue(_pack[0][j].ToString(), _pack[i][j], _pack[1][j].ToString()));
                 }
                 if (pack.ContainsKey(_pack[i][0].ToString()))
                 {
@@ -59,7 +59,7 @@ public class PerExcel
                 Hashtable row = new Hashtable();
                 for (int j = 0; j < _colNum; j++)
                 {
-                    row.Add(_pack[1][j], GetValue(_pack[0][j].ToString().ToLower(), _pack[i][j]));
+                    row.Add(_pack[1][j].ToString(), GetValue(_pack[0][j].ToString().ToLower(), _pack[i][j], _pack[1][j].ToString()));
                 }
                 pack.Add(row);
             }
@@ -69,26 +69,40 @@ public class PerExcel
             UnityEngine.Debug.LogError("Init配表type发生错误" + "错误类型:" + _type);
         }
     }
-    dynamic GetValue(string _type, dynamic _value)
+    dynamic GetValue(string _type, dynamic _value, string row)
     {
         if (_type == "int")
         {
-            return Convert.ToInt32(_value.ToString());
+            //UnityEngine.Debug.Log(_value);
+            //UnityEngine.Debug.Log(Convert.ToByte(_value));
+            //UnityEngine.Debug.Log(row);
+           
+            return (_value == null || _value.ToString() == "") ? null : Convert.ToInt32(_value.ToString());
         }
         else if (_type == "double")
         {
-            return Convert.ToDouble(_value.ToString());
+            // UnityEngine.Debug.Log(_value);
+            //UnityEngine.Debug.Log(Convert.ToByte(_value));
+            return (_value == null || _value.ToString() == "") ? null : Convert.ToDouble(_value.ToString());
         }
         else if (_type == "string")
         {
-            return _value.ToString();
+
+            return (_value == null || _value.ToString() == "") ? null : _value.ToString();
         }
         else if (_type == "bool")
         {
-            return Convert.ToBoolean(_value.ToString());
+            // UnityEngine.Debug.Log(_value);
+            //UnityEngine.Debug.Log(Convert.ToByte(_value));
+            return (_value == null || _value.ToString() == "") ? false : Convert.ToBoolean(_value.ToString());
         }
         else if (_type == "hashtable")
         {
+            // UnityEngine.Debug.Log(_value);
+            if (_value == null || _value.ToString() == "")
+            {
+                return null;
+            }
             string json = _value.ToString();
             Hashtable jd = JsonMapper.ToObject<Hashtable>(json);
             foreach (DictionaryEntry de in jd)

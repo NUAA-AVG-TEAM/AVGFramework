@@ -76,3 +76,5 @@ crashlytics-build.properties
 
 # MacOS
 .DS_Store
+
+SIMSUNB SDF.asset

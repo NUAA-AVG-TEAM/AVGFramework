@@ -1,44 +1,61 @@
-ï»¿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using PanelDisplayManagement;
+using UnityEngine.UI;
+using CoroutineManagement;
 
-public class CGPanel : MonoBehaviour
+public class CGPanel : BasePanel
 {
-    private static CGPanel instance;
-
-    public static CGPanel GetInstance
+    /* DATA */
+    // panel Ô¤ÖÆÌåÎ»ÖÃ
+    public CGPanel() : base("Prefabs/UI/Panel/CGPanel") { }
+    // µ±Ç°²¥·ÅµÄÖ¡£¬0±íÊ¾ÉĞÎ´¿ªÊ¼²¥·Å
+    int nowFrame = 0;
+    // ×ÜÖ¡Êı
+    int totalFrame = 5;
+    // fPS
+    float fps = 5.0f;
+    /* LOGIC */
+    sealed public override IEnumerator OnShow()
     {
-        get { return instance; }
+        // ¸¸ÀàOnshow
+        yield return CoroutineManager.GetInstance().StartCoroutine(base.OnShow());
+        // ²¥·Å¶¯»­
+        yield return CoroutineManager.GetInstance().StartCoroutine(PlayAnimation());
+        // °ó¶¨°´Å¥ÊÂ¼ş
+        if (panelObj != null)
+        {
+            GetOrAddComponetInChild<Button>("BtnExit").onClick.AddListener(() =>
+            {
+                Debug.Log("BtnExit is clicked");
+                // ÇĞ»» AppreciateGUI
+                /// ½«µ±Ç°×´Ì¬ÏÂµÄ panel È«²¿POP
+                CoroutineManager.GetInstance().StartCoroutine(PanelDisplayManager.GetInstance().Pop());
+              
+            });
+        }
     }
 
-    private void Awake()
+    /// ²¥·ÅÏÂÒ»Ö¡
+    private void NextFrame()
     {
-        instance = this;
-    }
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
+        // »ñÈ¡Í¼Æ¬ÌùÍ¼Î»ÖÃ
+        Button btnNext = GetOrAddComponetInChild<Button>("BtnExit");
+        // btnNext.image.sprite = ĞÂÍ¼Æ¬
+        nowFrame++;
+        Debug.Log($"Frame : {nowFrame} / {totalFrame}");
     }
 
-    /// <summary>
-    /// AppreciateGUIçŠ¶æ€æœºåˆ‡æ¢åˆ°è¯¥UIæ—¶è§¦å‘
-    /// </summary>
-    public void OnEnter()
+    /// ×Ô¶¯²¥·Å
+    private IEnumerator PlayAnimation()
     {
-
-    }
-
-    /// <summary>
-    /// ä»è¯¥UIåˆ‡æ¢åˆ°å¦ä¸€ä¸ªUIæ—¶è§¦å‘
-    /// </summary>
-    public void OnLeave()
-    {
-
+        nowFrame = 0;
+        while (nowFrame < totalFrame)
+        {
+            NextFrame();
+            yield return new WaitForSecondsRealtime(1 / fps);
+        }
+        yield break;
     }
 }
