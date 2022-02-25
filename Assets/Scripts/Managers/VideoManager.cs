@@ -28,7 +28,7 @@ public class VideoManager : MonoBehaviour
         //videoPlayer.canSetTime = true;
     }
 
-    public IEnumerator PlayVideo(string _name,UnityEngine.Video.VideoPlayer vp)
+    /*public IEnumerator PlayVideo(string _name,UnityEngine.Video.VideoPlayer vp)
     {
         vp.url = _name;
         vp.Prepare();
@@ -36,7 +36,7 @@ public class VideoManager : MonoBehaviour
         
         vp.Play();
         
-    }
+    }*/
 
     public void StopVideo(string _name,UnityEngine.Video.VideoPlayer vp)
     {
