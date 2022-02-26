@@ -36,6 +36,8 @@ public class GamingPanel : MonoBehaviour
     private bool _isClick;
     private bool isSkip = false;  //是否处在跳过模式
     private int msg = 0;
+
+    private int processNum = 0;
     private bool IsSkip
     {
         // skip模式下，除了hide，均无法点击
@@ -153,7 +155,9 @@ public class GamingPanel : MonoBehaviour
         nowIndex = _nowIndex;
         groupIndex = _groupIndex;
         LogPanel.GetInstance.OnLeave();
+        this.OnLeave();
         UIManager.GetInstance.GetSMachine.ChangeState("GamingGUI");
+        Debug.Log("OnEnter");
     }
 
 
@@ -486,14 +490,20 @@ public class GamingPanel : MonoBehaviour
         isGaming = false;
         btn.onClick.RemoveAllListeners();
         StopCoroutine("GameStart");
-
-        bg.color = new Color(bg.color.r, bg.color.g, bg.color.b, 0);
-        // 目前图片的透明度变成0
-        //不阻塞线程，两个显示同时触发即可~
-        bg.DOFade(0, 0.5f).OnComplete(() => {
-            gameObject.SetActive(false);
-            bg.color = new Color(bg.color.r, bg.color.g, bg.color.b, 1);
-        });
+        Debug.Log("StopCoroutines");
+        /// 若不是gaming切换gaming
+        
+        if(UIManager.GetInstance.GetSMachine.GetState() != "GamingGUI")
+        {
+            bg.color = new Color(bg.color.r, bg.color.g, bg.color.b, 0);
+            // 目前图片的透明度变成0
+            //不阻塞线程，两个显示同时触发即可~
+            bg.DOFade(0, 0.5f).OnComplete(() => {
+                gameObject.SetActive(false);
+                bg.color = new Color(bg.color.r, bg.color.g, bg.color.b, 1);
+            });
+        }
+        
         
 
         
@@ -716,7 +726,7 @@ public class GamingPanel : MonoBehaviour
 
     IEnumerator GameStart()
     {
-        
+
         // 需保证在执行协程之前，这些变量均初始化好，后补健壮处理
         // 假如是存档 / 继续游戏/ 开始游戏进来的，需要重置，重置前默认把groupIndex重置成0即可
         // 否则目前的状态可以利用，groupindex不用重置
@@ -726,12 +736,15 @@ public class GamingPanel : MonoBehaviour
             groupIndex = nowIndex;
         }
         */
+        int process = processNum;
+        processNum += 1;
 
-        
-
-        // only for test
-        nowIndex = 4;
-
+        Debug.Log(UIManager.GetInstance.GetSMachine.GetLastState());
+        if(UIManager.GetInstance.GetSMachine.GetLastState() == "MainGUI")
+        {
+            // only for test
+            nowIndex = 4;
+        }
         // test end
         int nextIndex = nowIndex + 1;
         
@@ -789,6 +802,7 @@ public class GamingPanel : MonoBehaviour
         btn.onClick.AddListener(StopSkip);
         while (nowIndex != 0)
         {
+            Debug.Log("Process:" + process);
             Hashtable nowInstr = instrPack[nowIndex];
             Debug.Log(nowInstr["nextIndex"]);
             nextIndex = nowInstr["nextIndex"] == null ? nowIndex + 1 : (int)nowInstr["nextIndex"];
