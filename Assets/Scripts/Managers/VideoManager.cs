@@ -35,6 +35,7 @@ public class VideoManager : MonoBehaviour
         Debug.Log("Video Prepared and Play");
         
         vp.Play();
+        yield return 0;
         
     }
 
