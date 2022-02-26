@@ -35,7 +35,7 @@ public class VideoManager : MonoBehaviour
         Debug.Log("Video Prepared and Play");
         
         vp.Play();
-        yield break;
+        
     }
 
     public void StopVideo(string _name,UnityEngine.Video.VideoPlayer vp)
