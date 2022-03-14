@@ -9,6 +9,8 @@ using UnityEngine;
 /// @param dialog: 当前对话
 /// @param nowDate: 当前日期的格式化字符串形式
 /// </summary>
+
+
 public class SaveData
 {
     public int index;

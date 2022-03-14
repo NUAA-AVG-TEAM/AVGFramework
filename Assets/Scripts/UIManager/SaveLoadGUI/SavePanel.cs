@@ -1,44 +1,29 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class SavePanel : MonoBehaviour
+using PanelDisplayManagement;
+using UnityEngine.UI;
+using CoroutineManagement;
+public class SavePanel : BasePanel
 {
     private static SavePanel instance;
-
+    public SavePanel() : base("Prefabs/UI/Panel/SavePanel") { }
     public static SavePanel GetInstance
     {
         get { return instance; }
     }
-
-    private void Awake()
+    sealed public override IEnumerator OnShow()
     {
-        instance = this;
-    }
-    void Start()
-    {
+        // 父类OnShow
+        yield return CoroutineManager.GetInstance().StartCoroutine(base.OnShow());
+        // 绑定按钮事件
+        if (panelObj != null)
+        {
+            //绑定存档按钮
+            for(int i=0;i<=8;i++)
+            {
 
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
-    /// <summary>
-    /// SaveLoadGUI状态机切换到该UI时触发
-    /// </summary>
-    public void OnEnter()
-    {
-
-    }
-
-    /// <summary>
-    /// 从该UI切换到另一个UI时触发
-    /// </summary>
-    public void OnLeave()
-    {
-
+            }
+        }
     }
 }

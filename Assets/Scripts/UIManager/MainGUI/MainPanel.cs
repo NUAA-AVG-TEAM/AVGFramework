@@ -35,7 +35,7 @@ public class MainPanel : BasePanel
                 /// 将当前状态下的 panel 全部POP
                 CoroutineManager.GetInstance().StartCoroutine(PanelDisplayManager.GetInstance().Pop());
                 // CoroutineManager.GetInstance().StartCoroutine(PanelDisplayManager.GetInstance().Push(new LoadPanel()));
-                UIManager.GetInstance.GetSMachine.ChangeState("GamingGUI");
+                UIManager.GetInstance.GetSMachine.ChangeState("SaveLoadGUI");
             });
 
             GetOrAddComponetInChild<Button>("BtnAppreciate").onClick.AddListener(() =>
