@@ -38,6 +38,10 @@ public class DataManager : MonoBehaviour
     {
         return saveData;
     }
+    public void changeSaveData(SaveData data)
+    {
+        saveData = data;
+    }
     public void saveDate_Init()
     {
         var path = Path.Combine(Application.persistentDataPath, "saveFile_last");
@@ -74,9 +78,9 @@ public class DataManager : MonoBehaviour
         }
     }  
     //存档
-    public void saveFile(SaveData data,string path)
+    public void saveFile(string path)
     {
-        var json = JsonUtility.ToJson(data);
+        var json = JsonUtility.ToJson(saveData);
         try
         {
             File.WriteAllText(path,json);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using PanelDisplayManagement;
 using UnityEngine.UI;
+using System.IO;
 using CoroutineManagement;
 public class SavePanel : BasePanel
 {
@@ -22,7 +23,14 @@ public class SavePanel : BasePanel
             //绑定存档按钮
             for(int i=0;i<=8;i++)
             {
-
+                int z = new int();
+                z = i;
+                GetOrAddComponetInChild<Button>("file" + z.ToString()).onClick.AddListener(() =>
+                {
+                    Debug.Log(z.ToString());
+                    var path = Path.Combine(Application.persistentDataPath, "saveFile" + z.ToString());//存档路径
+                    DataManager.GetInstance.saveFile(path);//读取数据填上
+                });
             }
         }
     }

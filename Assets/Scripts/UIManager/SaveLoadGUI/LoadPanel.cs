@@ -41,7 +41,7 @@ public class LoadPanel : BasePanel
                   {
                       Debug.Log(z.ToString());
                       var path = Path.Combine(Application.persistentDataPath, "saveFile" + z.ToString());//存档路径
-                    DataManager.GetInstance.loadFile(path);
+                      DataManager.GetInstance.loadFile(path);
                   });
             }
         }

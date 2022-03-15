@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
+using UnityEngine.UI;
 using CoroutineManagement;
 public class QLoadPanel : BasePanel
 {
@@ -20,8 +22,16 @@ public class QLoadPanel : BasePanel
             //绑定存档按钮
             for (int i = 0; i <= 8; i++)
             {
-
+                int z = new int();
+                z = i;
+                GetOrAddComponetInChild<Button>("file" + z.ToString()).onClick.AddListener(() =>
+                {
+                    Debug.Log(z.ToString());
+                    var path = Path.Combine(Application.persistentDataPath, "qsaveFile" + z.ToString());//存档路径
+                    DataManager.GetInstance.loadFile(path);
+                });
             }
+        
         }
     }
 }

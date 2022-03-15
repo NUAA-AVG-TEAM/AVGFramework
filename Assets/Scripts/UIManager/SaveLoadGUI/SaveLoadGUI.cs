@@ -52,7 +52,6 @@ public class SaveLoadGUI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        panel.transform.SetAsLastSibling();
     }
 
     /// <summary>
